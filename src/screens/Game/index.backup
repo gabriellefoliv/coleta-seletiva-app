@@ -1,0 +1,290 @@
+//IMPORTS
+import React, {useState, useEffect }  from 'react'
+import { View, Text,
+         TouchableOpacity , Modal,
+         Image, StatusBar, ScrollView, ImageBackground,} from 'react-native'
+         
+import {useAuth} from '../../contexts/auth'
+import {COLORS,FONTS, icons, images, SIZES} from '../../constants'
+import LocalStyles from './styles.js'
+import api from '../../services/api.js'
+import Config from '../../config/config'
+import apireciclotron from "../../services/apireciclotron";
+import News from '../NewsScreen'
+import Footer from '../Footer/index'
+
+import CountdownTimer from '../../components/CountdownTimer/CountdownTimer'
+
+//MAIN
+export default function({navigation}){
+
+    //#region CONSTANTES
+    const {user, signOut} = useAuth()
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const handleQrModal = () => setIsModalVisible(() => !isModalVisible);
+    const [lstRanking, setLstRanking] = useState([{usuario: 'carregando'}]);
+    const [kgReciclados, setKgReciclados] = useState(0)
+    const [userPoints,setUserPoints] = useState(0);
+    const [load, setLoad] = useState(true);
+    const [reciclotron_json, set_reciclotron_json] = useState();
+    const [hora, setHora] = useState(2);
+    const [timeparam, settimeparam] = useState(400);
+    
+    const handleSignOut = () => {
+        signOut();
+    }
+
+    const setHomeVariables =(contents) =>{
+        //console.log(contents),
+        //setLstRanking(contents[0]),
+        //setKgReciclados(contents[1]),
+        //setUserPoints(contents[2].pontos)
+        
+        //setNumFases(contents[0][0]),
+        //duvida helio 
+        //O que vem em contents?
+    }
+
+    const renderPlanta = () => {
+        
+        useEffect(() => {
+          const intervalId = setInterval(() => {
+            setHora(prevHora => (prevHora + 2) % 24);
+          }, timeparam);
+      
+          return () => clearInterval(intervalId);
+        }, []);
+      
+        if (hora >= 0 && hora < 6){
+          return images.planta0;
+        } else if (hora >= 6 && hora < 12){
+          return images.planta1;
+        } else if (hora >= 12 && hora < 18){
+          return images.planta2;
+        } else if (hora >= 18  && hora < 24) {
+            return images.planta4;
+        }
+      }
+
+    const init = async() => {
+        try{
+            const contents = await  api.get("http://"+Config.apiBaseURL+"/users/ranking/")
+                                        .then((response)=>{
+                                            return response.data.response.Ranking
+                                        })
+                                        .catch((err) => {
+                                            console.error("ops! ocorreu um erro" + err);
+                                        });
+        
+            const quilos = await  api.get("http://"+Config.apiBaseURL+"/coletas/getquilos/"+user.id)
+                                        .then((response)=>{
+                                            return response.data.result[0].totalReciclado
+                                        })
+                                        .catch((err) => {
+                                            console.error("ops! ocorreu um erro" + err);
+                                        });
+
+            const userData = await api.get("http://"+Config.apiBaseURL+"/users/data/"+user.id)
+                                        .then((response)=>{
+                                            return response.data.response.UserData[0]
+                                        })
+                                        .catch((err) => {
+                                            console.error("ops! ocorreu um erro" + err);
+                                        });
+            const reciclotron = await apireciclotron
+                                        .post("https://reciclopontos.com.br/api/partner_rate.php",{
+                                            partner: 23052116000108,
+                                            token: "906007c7b743ac1ef7a6247d0",
+                                            CNPJ: 28523215000106,
+                                            description: "Conversão de Pontos em Reciclopontos",
+                                            points: 1000, 
+                                            autonum: "75883410",
+                                        })
+                                        .then((response)=> {
+                                            set_reciclotron_json(response.data);
+                                            console.log(response.data)
+                                        })
+                                        .catch((err) => {
+                                            console.error(err)
+                                        });
+            
+            return [contents,quilos,userData]
+        }
+        catch(err){
+            console.log(err)
+        }
+    }
+    //#endregion
+    
+    //#region USE EFFECT
+    useEffect(() => {
+        navigation.addListener('focus', async ()=>setLoad(!load))
+        init().then(
+            contents=> setHomeVariables(contents)
+        )
+    }, [load,navigation]);
+    //#endregion
+
+    return (
+        <>
+        
+        <ImageBackground                                                //GAME
+                source={images.demoGame}
+                style={LocalStyles.bg}>
+                    
+                <ScrollView horizontal={false} style={LocalStyles.gameContainer}>   
+                    <View 
+                    style = {LocalStyles.gameButtonsArea} /** Botoes */>
+                    <TouchableOpacity //PLANTA
+                        //onPress={()=>{navigation.navigate('Dashboard')}}
+                        //Dúvida Hélio
+                        //Desligar efeito de esmaecer ao clicar até que tal condição seja realizada   1666219000000
+                        style={LocalStyles.planta}>
+                            
+                            <Image
+                                source={renderPlanta()} //ao invés de images.planta4 coloca o nome da constante //duvida helio
+                                style={{
+                                    width: '70%',
+                                    height: '70%',
+                                    left: 20,
+                                    top: 70,
+                                }}
+                                resizeMode='contain'
+                            >
+                            </Image>
+                            
+                            <CountdownTimer countdownTimeStampMs = { 1666219000000 
+                            /*
+                            Pegar o horario atual de uma API!
+
+                            You need the current timestamp in milliseconds.
+                            Right now that would be: 1634841561404
+                            Then you need to add the amount of milliseconds in 48 hours. So:
+                            48h * 60min * 60sec * 1000millisecond -> 172800000 milliseconds
+                            So the timestamp should be:
+                            1634841561404 + 172800000
+                             */
+                            }></CountdownTimer>   
+                    </TouchableOpacity>
+
+                    <TouchableOpacity //REGADOR
+                        //onPress={()=>{navigation.navigate('Dashboard')}}
+                        style={LocalStyles.gameButtons}>
+                            <Image
+                                source={icons.regador}
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    left: 160,
+                                    top: 100,
+                                }}
+                                resizeMode='contain'
+                            />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity //PA
+                        //onPress={()=>{navigation.navigate('Dashboard')}}
+                        style={LocalStyles.gameButtons}>
+                            <Image
+                                source={icons.pa}
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    left: 160,
+                                    top: 160,
+                                }}
+                                resizeMode='contain'
+                            />
+                    </TouchableOpacity>
+                    
+                    </View>
+                </ScrollView>
+        </ImageBackground>
+
+        <Footer navigation={navigation} init={init}/>
+
+       
+        </>
+    );
+}
+
+
+
+
+import React, { Component } from 'react';
+import { View, Image, TouchableWithoutFeedback, Text } from 'react-native';
+
+// Importando as imagens da planta em diferentes níveis
+const plantaImagens = [
+  require('./planta-level-0.png'),
+  require('./planta-level-1.png'),
+  require('./planta-level-2.png'),
+  require('./planta-level-3.png'),
+  require('./planta-level-4.png')
+];
+
+class Planta extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      level: 0,
+      loading: false
+    };
+
+    // Intervalo que atualiza o nível da planta a cada 15 segundos
+    setInterval(() => {
+      if (this.state.level < plantaImagens.length - 1) {
+        this.setState({ level: this.state.level + 1 });
+      }
+    }, 15000);
+  }
+
+  // Função que é chamada quando o usuário toca na planta
+  handlePlantaPress = () => {
+    if (!this.state.loading && this.state.level === 4) {
+      // Planta foi colhida!
+      this.setState({ level: 0, loading: true });
+
+      // Espera 2 segundos antes de permitir a coleta novamente
+      setTimeout(() => {
+        this.setState({ loading: false });
+      }, 2000);
+    }
+  }
+
+  render() {
+    const { level, loading } = this.state;
+
+    // Define o tamanho da imagem da planta de acordo com o nível
+    let imageSize = 100;
+    if (level === 0) {
+      imageSize = 50;
+    } else if (level === 1) {
+      imageSize = 60;
+    } else if (level === 2) {
+      imageSize = 80;
+    } else if (level === 3) {
+      imageSize = 90;
+    }
+
+    // Define a cor do círculo de loading de acordo com o estado
+    let loadingColor = 'rgba(0,0,0,0.2)';
+    if (loading) {
+      loadingColor = 'rgba(0,0,0,0.8)';
+    }
+
+    return (
+      <TouchableWithoutFeedback onPress={this.handlePlantaPress}>
+        <View style={{ alignItems: 'center' }}>
+          <View style={{ borderRadius: imageSize / 2, backgroundColor: loadingColor, width: imageSize, height: imageSize, justifyContent: 'center', alignItems: 'center' }}>
+            <Image source={plantaImagens[level]} style={{ width: imageSize - 10, height: imageSize - 10 }} />
+          </View>
+          <Text style={{ marginTop: 5 }}>Planta</Text>
+        </View>
+      </TouchableWithoutFeedback>
+    );
+  }
+}
+
+export default Planta;
