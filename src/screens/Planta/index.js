@@ -105,21 +105,27 @@ const Planta = () => {
     return (
         <ImageBackground style={styles.container} source={Shelf}>
 
-            <View style={styles.plantIcon} /*ICONE DE PLANTAS COLETADAS*/>
-                <Image style={styles.plant_icon} source={planta_icon} />
-                <Text style={styles.plantas_coletadas}>{plantasColetadas}</Text>
-            </View>
 
-            <TouchableOpacity style={styles.planta} onPress={coletarPlanta} disabled={happiness < MAX_HAPPINESS}>
-                <Image source={
-                    happiness >= 15 ? planta4 :
-                        happiness >= 12 ? planta3 :
+            <View style={styles.container}>
+                <View style={styles.plantIcon}>
+                    <Image style={styles.plant_icon} source={planta_icon} />
+                    <Text style={styles.plantas_coletadas}>{plantasColetadas}</Text>
+                </View>
+                    <TouchableOpacity style={styles.planta} onPress={coletarPlanta} disabled={happiness < MAX_HAPPINESS}>
+                        <Image
+                        source={
+                            happiness >= 15 ? planta4 :
+                            happiness >= 12 ? planta3 :
                             happiness >= 8 ? planta2 :
-                                happiness >= 4 ? planta1 :
-                                    planta0} style={styles.headerImage} />
+                            happiness >= 4 ? planta1 :
+                            planta0
+                        }
+                        style={styles.headerImage}
+                        />
+                    </TouchableOpacity>
 
-            </TouchableOpacity>
-            <Image style={styles.vase} source={vase} />
+                    <Image style={styles.vase} source={vase} />
+            </View>
 
             <View style={styles.actionsContainer} /* REGADOR */>
                 <TouchableOpacity style={styles.action} onPress={increaseGrowthPace} disabled={regadorDisponivel < MAX_REGADOR}>
@@ -222,13 +228,14 @@ const styles = StyleSheet.create({
     },
     planta: {
         position: 'absolute',
-        top: 75,
+        top: 170,
+        paddingLeft: 10,
     },
     vase: {
         position: 'absolute',
         top: 180,
         left: -30,
-        width: 500,
+        width: '38%' ,
         height: 350,
     },
     icone: {
@@ -236,8 +243,8 @@ const styles = StyleSheet.create({
         height: 50,
     },
     headerImage: {
-        width: 250,
-        height: 250,
+        width: 150,
+        height: 150,
         resizeMode: 'contain'
     },
     iconContainer: {

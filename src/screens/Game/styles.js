@@ -25,6 +25,7 @@ export default StyleSheet.create({
         width: '15%',
         height: '15%',
     },
+    
     planta :{
         
         height: 300, 
