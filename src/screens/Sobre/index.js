@@ -4,16 +4,17 @@ import { View, Text, ScrollView } from 'react-native';
 import LocalStyles from './styles.js';
 
 //MAIN
-export default function TermsOfUseScreen({ navigation }) {
+export default function AboutScreen({ navigation }) {
   return (
     <View style={LocalStyles.container}>
       <View style={LocalStyles.main}>
-        <Text style={LocalStyles.title}>Desenvolvedores</Text>
+        <Text style={LocalStyles.title}>Sobre</Text>
       </View>
       <View style={LocalStyles.intro}>
         <Text style={LocalStyles.introText}>
-          Bem-vindo a página de desenvolvedores.
-          Segue as páginas do github de cada dev:
+          Bem-vindo a página de sobre. Aqui você vai ser informar sobre:
+          * Resumo / informações gerais;
+          * Versionamento do aplicativo;
         </Text>
       </View>
       <ScrollView style={LocalStyles.scrollView}>

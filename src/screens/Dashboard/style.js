@@ -41,13 +41,13 @@ export default StyleSheet.create({
         height: 30,
         width: 30,
         resizeMode: 'contain',
-        marginTop: StatusBar.currentHeight,
+        // marginTop: StatusBar.currentHeight,
     },
 
     logoutButton: {
         height: 30,
         width: 30,
-        marginTop: StatusBar.currentHeight * 1.2,
+        // marginTop: StatusBar.currentHeight * 1.2,
     }
 
     , userDetailsArea: {
