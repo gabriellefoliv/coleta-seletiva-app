@@ -6,7 +6,7 @@ import {useAuth} from '../../contexts/auth'
 import api from '../../services/api.js'
 import { COLORS, FONTS, SIZES } from '../../constants/theme.js'
 import moment from 'moment'
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 
 export default function({route,navigation,}){

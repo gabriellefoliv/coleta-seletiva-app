@@ -5,9 +5,7 @@ import Config from '../../config/config'
 import { useAuth } from '../../contexts/auth'
 import api from '../../services/api.js'
 import { COLORS, FONTS, SIZES } from '../../constants/theme.js'
-import moment from 'moment'
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-
+import { Feather } from '@expo/vector-icons'
 import Profile from '../../assets/icons/profile.png'
 import Logout from '../../assets/icons/logout.png'
 
@@ -142,7 +140,7 @@ export default function ({ navigation, }) {
 
                             <View style={{ flex: 1, alignItems: 'center', marginLeft: 0 }}>
                                 <Text style={{ color: COLORS.gray, }}>
-                                    {moment(coletas.data).format('DD.MM.YYYY')}
+                                    {coletas.data}
                                 </Text >
                             </View>
 
@@ -166,11 +164,9 @@ export default function ({ navigation, }) {
                 <TouchableOpacity style={{ backgroundColor: COLORS.primary, height: 70, width: 70, borderRadius: 100, position: 'absolute', bottom: 20, justifyContent: 'center', alignItems: 'center' }}
 
                     onPress={() => { navigation.navigate('ScannerQRCode', { id_coletor: user.id_coletor }) }}>
-                    <MaterialCommunityIcons name="camera-outline" style={{
-
+                    <Feather name="camera" style={{
                         color: COLORS.white,
                         fontSize: 55,
-
                     }} />
                 </TouchableOpacity>
             </View>

@@ -6,7 +6,7 @@ import {useAuth} from '../../contexts/auth'
 import api from '../../services/api.js'
 import { COLORS, FONTS, SIZES } from '../../constants/theme.js'
 import moment from 'moment'
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import {AntDesign} from '@expo/vector-icons'
 
 
 export default function({navigation,}){
@@ -48,7 +48,7 @@ export default function({navigation,}){
                 <View style={{height: '50%', width: '100%', /*backgroundColor: '#a48ff5',*/ flexDirection: 'row', paddingHorizontal: 10}}>
                     <TouchableOpacity style={{/*backgroundColor: '#998881',*/ width:'50%', flex: 1, justifyContent:'center'}}
                         onPress={()=>navigation.goBack()}>
-                        <MaterialCommunityIcons name="arrow-left" style={{
+                        <AntDesign name="arrow-left" style={{
                                 color: COLORS.white,
                                 fontSize: 20,
                                 alignItems: 'stretch',

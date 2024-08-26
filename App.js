@@ -24,13 +24,13 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Coletor" component={Coletor} />
         <Stack.Screen name="UseTerms" component={TermsOfUseScreen} />
         <Stack.Screen name="Sobre" component={AboutScreen} />
         <Stack.Screen name="Loja" component={Loja} />
         <Stack.Screen name="Game" component={Game} />
         <Stack.Screen name="Planta" component={Planta} />
         <Stack.Screen name="About" component={About} />
-        <Stack.Screen name="Coletor" component={Coletor} />
         <Stack.Screen name="Desenvolvedores" component={Desenvolvedores} />
         <Stack.Screen name="InfoColeta" component={InfoColeta} />
         <Stack.Screen name="HomeColetor" component={HomeColetor} />

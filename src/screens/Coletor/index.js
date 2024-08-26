@@ -4,9 +4,8 @@ import LocalStyles from './style.js'
 import api from '../../services/api.js'
 import Config from '../../config/config'
 import { COLORS, FONTS, SIZES } from '../../constants/theme.js'
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import { mask, unMask } from 'remask'
-
+//import { mask, unMask } from 'remask'
+import {AntDesign} from '@expo/vector-icons'
 
 export default function ({ navigation, route, }) {
 
@@ -123,7 +122,7 @@ export default function ({ navigation, route, }) {
                             onPress={() => navigation.navigate('HomeColetor')}
                             pressRetentionOffset={true}
                         >
-                            <MaterialCommunityIcons name="arrow-left" style={{
+                            <AntDesign name="arrowleft" style={{
                                 color: COLORS.white,
                                 fontSize: 20,
                                 alignItems: 'stretch',
