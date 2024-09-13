@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { api } from '../lib/axios';
+import { api } from '../../../lib/axios';
 
 export default function Login({ navigation }) {
     const [email, setEmail] = useState('');
@@ -13,22 +13,35 @@ export default function Login({ navigation }) {
             return;
         }
 
-        try {
-            const response = await api.post('/login', {
-                email,
-                password,
-            });
+        navigation.navigate('Home');
 
-            const { token } = response.data;
+        // try {
+        //     const response = await api.post('/login', {
+        //         email,
+        //         password,
+        //     });
 
-            // Persistindo o token no AsyncStorage
-            await AsyncStorage.setItem('token', token);
+        //     if (response && response.data) {
+        //         const { token } = response.data;
 
-            // Navegar para a tela inicial ou qualquer outra
-            navigation.navigate('Home');
-        } catch (error) {
-            Alert.alert('Erro', 'Credenciais inválidas');
-        }
+        //         // Persistindo o token no AsyncStorage
+        //         await AsyncStorage.setItem('token', token);
+
+        //         // Navegar para a tela inicial ou qualquer outra
+        //         navigation.navigate('Home');
+        //     } else {
+        //         Alert.alert('Erro', 'Resposta da API inválida');
+        //     }
+        // } catch (error) {
+        //     console.log('Erro na requisição:', error);
+
+        //     if (error.response && error.response.data) {
+        //         console.log('Erro na resposta da API:', error.response.data);
+        //         Alert.alert('Erro', error.response.data.error || 'Credenciais inválidas');
+        //     } else {
+        //         Alert.alert('Erro', 'Não foi possível conectar ao servidor. Tente novamente mais tarde.');
+        //     }
+        // }
     };
 
     return (
@@ -51,7 +64,7 @@ export default function Login({ navigation }) {
             <Button title="Login" onPress={handleLogin} />
             <Button
                 title="Cadastrar-se"
-                onPress={() => navigation.navigate('SignIn')}
+                onPress={() => navigation.navigate('SignUp')}
             />
         </View>
     );

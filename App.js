@@ -3,9 +3,11 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ActivityIndicator } from 'react-native';
-import Home from './src/screens/home';
-import Login from './src/screens/login';
-import SignIn from './src/screens/signin';
+import Login from './src/screens/Auth/Login';
+import Home from './src/screens/Home';
+import QuizLevels from './src/screens/Quiz/QuizLevels';
+import QuizScreen from './src/screens/Quiz/QuizScreen';
+import SignUp from './src/screens/Auth/SignUp';
 
 const Stack = createNativeStackNavigator();
 
@@ -39,14 +41,20 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
         {isAuthenticated ? (
           <>
             <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen name="QuizLevels" component={QuizLevels} />
+            <Stack.Screen name="QuizScreen" component={QuizScreen} />
           </>
         ) : (
           <>
-            <Stack.Screen name="SignIn" component={SignIn} />
+            <Stack.Screen name="SignUp" component={SignUp} />
             <Stack.Screen name="Login" component={Login} />
           </>
         )}
