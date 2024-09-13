@@ -16,6 +16,7 @@ export default function RegisterStep({ qrCodeData, onRegisterSuccess }) {
 
         try {
             const response = await api.post('/register', {
+                step: 'completeRegistration',
                 name,
                 cpf,
                 password,
