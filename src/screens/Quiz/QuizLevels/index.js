@@ -1,41 +1,44 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import Header from '../../../components/Header';
+import React, { useContext } from 'react';
+import { Alert, Text, TouchableOpacity, View } from 'react-native';
+import { AuthContext } from '../../../context/auth';
 import { styles } from './style';
+import Header from '../../../components/Header';
+import { api } from '../../../lib/axios';
 
-const QuizLevels = () => {
-    const navigation = useNavigation();
+export const QuizLevels = ({ navigation }) => {
+    const { user } = useContext(AuthContext);
+
+    const handleLevelClick = async (dificuldade) => {
+        try {
+            console.log(`Verificando perguntas: codCliente=${user.codCliente}, dificuldade=${dificuldade}`);
+
+            const response = await api.get(`/quiz?codCliente=${user.codCliente}&dificuldade=${dificuldade}`);
+            if (response.data.message === "Sem perguntas disponíveis para o nível selecionado.") {
+                Alert.alert("Atenção", "Não há perguntas disponíveis para este nível.");
+            } else {
+                navigation.navigate("QuizScreen", { dificuldade });
+            }
+        } catch (error) {
+            console.error("Erro ao verificar perguntas disponíveis", error);
+            Alert.alert("Erro", "Houve um problema ao carregar as perguntas. Tente novamente mais tarde.");
+        }
+    };
 
     return (
-        <View style={styles.container}>
-            <Header title="Quiz Ambiental" />
-            <View style={styles.quizContainer}>
-                <TouchableOpacity
-                    style={styles.levelButton}
-                    onPress={() => navigation.navigate('QuizScreen', { level: 'fácil' })}
-                >
-                    <Text style={styles.levelText}>Fácil</Text>
+        <>
+            <Header title="Dificuldades" />
+            <View style={styles.container}>
+                <Text style={styles.title}>Escolha o nível do quiz</Text>
+                <TouchableOpacity style={styles.button} onPress={() => handleLevelClick('facil')}>
+                    <Text style={styles.buttonText}>Fácil</Text>
                 </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={styles.levelButton}
-                    onPress={() => navigation.navigate('QuizScreen', { level: 'médio' })}
-                >
-                    <Text style={styles.levelText}>Médio</Text>
+                <TouchableOpacity style={styles.button} onPress={() => handleLevelClick('medio')}>
+                    <Text style={styles.buttonText}>Médio</Text>
                 </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={styles.levelButton}
-                    onPress={() => navigation.navigate('QuizScreen', { level: 'difícil' })}
-                >
-                    <Text style={styles.levelText}>Difícil</Text>
+                <TouchableOpacity style={styles.button} onPress={() => handleLevelClick('dificil')}>
+                    <Text style={styles.buttonText}>Difícil</Text>
                 </TouchableOpacity>
             </View>
-        </View>
-    );
-};
-
-
-
-export default QuizLevels;
+        </>
+    )
+}

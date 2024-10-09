@@ -3,75 +3,70 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: 'center',
-        backgroundColor: '#E3F2FD',
-    },
-    quizContainer: {
-        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        width: '100%',
+        backgroundColor: '#f5f5f5',
+        padding: 20,
     },
-    levelText: {
-        fontSize: 20,
+    questionText: {
+        fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 20,
-        color: '#1976D2',
-    },
-    question: {
-        fontSize: 18,
-        marginBottom: 20,
         textAlign: 'center',
-        fontWeight: 'bold',
+        marginVertical: 20,
+        color: '#00907a',
     },
-    buttonContainer: {
-        flexDirection: 'column',
-        width: '100%',
-        justifyContent: 'center',
-    },
-    optionButton: {
-        backgroundColor: '#64B5F6',
+    button: {
+        backgroundColor: '#00907a',
         padding: 15,
         borderRadius: 10,
+        width: '80%',
         alignItems: 'center',
-        marginHorizontal: 20,
-        marginVertical: 5,
+        marginVertical: 10,
+        elevation: 3,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.2,
+        shadowRadius: 5,
     },
-    optionText: {
-        color: 'white',
-        fontSize: 16,
-    },
-    modalView: {
-        flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.3)',
-        borderRadius: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-    },
-    modalText: {
-        marginBottom: 20,
+    buttonText: {
+        color: '#fff',
         fontSize: 18,
-        textAlign: 'center',
+        fontWeight: 'bold',
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     modalContent: {
-        width: 300,
+        backgroundColor: '#fff',
         padding: 20,
-        backgroundColor: 'white',
         borderRadius: 10,
+        width: '80%',
         alignItems: 'center',
+        elevation: 5,
     },
-    closeButton: {
-        backgroundColor: '#2196F3',
-        borderRadius: 10,
+    modalText: {
+        fontSize: 18,
+        textAlign: 'center',
+        marginBottom: 10,
+    },
+    modalPoints: {
+        fontSize: 18,
+        textAlign: 'center',
+        marginBottom: 10,
+        fontWeight: 'bold'
+    },
+    modalButton: {
+        backgroundColor: '#00907a',
         padding: 10,
-        elevation: 2,
-    },
-    closeButtonText: {
-        color: 'white',
-        fontSize: 16,
+        borderRadius: 5,
+        marginTop: 10,
+        width: '50%',
+        alignItems: 'center',
     },
 });

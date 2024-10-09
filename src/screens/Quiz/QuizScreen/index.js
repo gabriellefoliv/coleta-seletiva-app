@@ -1,62 +1,105 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
-import Header from '../../../components/Header';
-import { styles } from './style';
+import { useRoute } from "@react-navigation/native"
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../../context/auth";
+import { api } from "../../../lib/axios";
+import { TouchableOpacity, Modal, Text, View } from "react-native";
+import { styles } from "./style";
+import Header from "../../../components/Header";
+import LottieView from "lottie-react-native";
 
-const QuizScreen = ({ route }) => {
-    const { level } = route.params;
-    const [answer, setAnswer] = useState(null);
-    const [modalVisible, setModalVisible] = useState(false);
+const QuizScreen = ({ navigation }) => {
+    const route = useRoute();
+    const { dificuldade } = route.params;
+    const { user } = useContext(AuthContext);
+    const [question, setQuestion] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [modal, setModal] = useState({ show: false, message: '', descricao_resposta: '', pontos: 0 })
 
-    const handleAnswer = (selectedAnswer) => {
-        setAnswer(selectedAnswer);
-        setModalVisible(true);
-    };
+    useEffect(() => {
+        const fetchQuestion = async () => {
+            try {
+                const response = await api.get(`/quiz?codCliente=${user.codCliente}&dificuldade=${dificuldade}`);
+                setQuestion(response.data);
+                console.log(response.data);
+                setLoading(false);
+            } catch (error) {
+                console.error("Erro ao carregar pergunta", error);
+            }
+        };
+        fetchQuestion();
+    }, [dificuldade, user.codCliente]);
 
-    const closeModal = () => {
-        setModalVisible(false);
-    };
+    const handleAnswer = async (resposta) => {
+        try {
+            const response = await api.post(`/quiz/${question.codPergunta}`, {
+                codCliente: user.codCliente,
+                resposta
+            });
 
-    return (
+            setModal({
+                show: true,
+                message: response.data.message,
+                descricao_resposta: response.data.descricao_resposta,
+                pontos: response.data.pontos || 0
+            })
+        } catch (error) {
+            console.error("Erro ao enviar resposta.", error);
+        }
+    }
+
+    const handleCloseModal = () => {
+        setModal({ ...modal, show: false });
+        navigation.navigate('Home');
+    }
+
+    if (loading) return <Text>Carregando pergunta...</Text>
+
+    return (<>
+        <Header title="Pergunta" />
         <View style={styles.container}>
-            <Header title="Pergunta" />
-            <View style={styles.quizContainer}>
-                <Text style={styles.levelText}>Nível: {level}</Text>
-                <Text style={styles.question}>O desmatamento contribui para o aquecimento global?</Text>
+            <Text style={styles.questionText}>{question.descricao_pergunta}</Text>
+            <TouchableOpacity style={styles.button} onPress={() => handleAnswer(1)}>
+                <Text style={styles.buttonText}>Verdadeiro</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={() => handleAnswer(0)}>
+                <Text style={styles.buttonText}>Falso</Text>
+            </TouchableOpacity>
 
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={styles.optionButton} onPress={() => handleAnswer(true)}>
-                        <Text style={styles.optionText}>Verdadeiro</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={styles.optionButton} onPress={() => handleAnswer(false)}>
-                        <Text style={styles.optionText}>Falso</Text>
-                    </TouchableOpacity>
-                </View>
-
-
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={modalVisible}
-                    onRequestClose={closeModal}
-                >
-                    <View style={styles.modalView}>
-                        <View style={styles.modalContent}>
-                            <Text style={styles.modalText}>
-                                {answer ? 'Correto! O desmatamento aumenta o aquecimento global.' : 'Errado! Na verdade, o desmatamento aumenta o aquecimento global.'}
-                            </Text>
-
-                            <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
-                                <Text style={styles.closeButtonText}>Fechar</Text>
-                            </TouchableOpacity>
-                        </View>
+            <Modal visible={modal.show} transparent={true}>
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalText}>{modal.message}</Text>
+                        {modal.pontos > 0 ? (<>
+                            <Text style={styles.modalPoints}>Você ganhou {modal.pontos} pt(s).</Text>
+                            <LottieView
+                                autoPlay
+                                style={{
+                                    width: 150,
+                                    height: 150,
+                                }}
+                                source={require('../../../assets/quiz/correctanswer.json')}
+                            />
+                        </>
+                        ) : (
+                            <LottieView
+                                autoPlay
+                                style={{
+                                    width: 150,
+                                    height: 150,
+                                }}
+                                source={require('../../../assets/quiz/incorrect.json')}
+                            />
+                        )}
+                        <Text style={styles.modalText}>{modal.descricao_resposta}</Text>
+                        <TouchableOpacity style={styles.modalButton} onPress={handleCloseModal}>
+                            <Text style={styles.buttonText}>OK</Text>
+                        </TouchableOpacity>
                     </View>
-                </Modal>
-            </View>
+                </View>
+            </Modal>
         </View>
-    );
-};
-
+    </>
+    )
+}
 
 export default QuizScreen;

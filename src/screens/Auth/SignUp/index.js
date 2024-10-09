@@ -31,12 +31,11 @@ export default function SignUp({ navigation }) {
     const handleQRCodeScanned = async (data) => {
         try {
             console.log('QRCode escaneado:', data); // Adicione este log para verificar o QRCode escaneado
-            const response = await api.post('/register', {
-                step: 'validateQRCode',
-                qrCode: parseInt(data, 10), // Certifique-se de que está enviando um número
+            const response = await api.post('/clientes/qrcode', {
+                codCliente: data
             });
 
-            console.log('Resposta da API:', response); // Adicione este log para verificar a resposta
+            console.log('Resposta da API:', response.data); // Adicione este log para verificar a resposta
 
             if (response.status === 200) {
                 Alert.alert('QR Code validado com sucesso!', `${data}`);

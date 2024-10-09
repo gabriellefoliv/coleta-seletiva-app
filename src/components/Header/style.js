@@ -8,7 +8,8 @@ export const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "space-around",
         padding: 20,
-
+        paddingTop: 50,
+        backgroundColor: 'transparent'
     },
     title: {
         color: "#000",
