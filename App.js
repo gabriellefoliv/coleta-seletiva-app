@@ -6,6 +6,7 @@ import SignUp from './src/screens/Auth/SignUp';
 import Login from "./src/screens/Auth/Login";
 import Ranking from './src/screens/Ranking';
 import QuizScreen from './src/screens/Quiz/QuizScreen';
+import Planta from './src/screens/planta'
 import { QuizLevels } from './src/screens/Quiz/QuizLevels';
 
 const Stack = createNativeStackNavigator();
@@ -19,6 +20,7 @@ const App = () => {
           <Stack.Screen name="SignUp" component={SignUp} />
           <Stack.Screen name="Home" component={Home} options={{ gestureEnabled: false }} />
           <Stack.Screen name="QuizLevels" component={QuizLevels} />
+          <Stack.Screen name="Planta" component={Planta} />
           <Stack.Screen name="QuizScreen" component={QuizScreen} />
           <Stack.Screen name="Ranking" component={Ranking} />
         </Stack.Navigator>
