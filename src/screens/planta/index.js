@@ -1,5 +1,8 @@
 import { api } from "../../lib/axios";
+import { useRoute } from "@react-navigation/native"
+import { AuthContext } from "../../../context/auth";
 import React, { useEffect, useState } from "react";
+import Header from "../../../components/Header";
 import planta0 from '../../assets/images/planta/0.png';
 import planta1 from '../../assets/images/planta/1.png';
 import planta2 from '../../assets/images/planta/2.png';
@@ -13,6 +16,8 @@ import { View,
     Image, StatusBar, KeyboardAvoidingView, ActivityIndicator} from 'react-native'
 
 const PlantaPage = ({ navigation }) => {
+    const route = useRoute();
+    const { user } = useContext(AuthContext);
     const [plantaData, setPlantaData] = useState(null);
     const [refresh, setRefresh] = useState(false);
     const [isLoading, setIsLoading] = useState(true); // Is loading é ativo enquanto a planta ainda é carregada.
@@ -20,17 +25,7 @@ const PlantaPage = ({ navigation }) => {
     const carregarPlanta = async () => {
         try{
             let response;
-            response = await api.get(`/planta/2`);
-            
-            // Sistema de criar nova nao funcionando ainda!
-            if (response.status === 204){
-                response = await api.post(`/planta/2`);
-                console.log(response.status);
-                response = await api.get(`/planta/2`);
-                setPlantaData(data);
-                console.log(data) // APAGAR DEPOIS
-                console.log(response.status);
-            }
+            response = await api.get(`/planta/${user.codCliente}`);
             const data = response.data[0];
             setPlantaData(data);
             console.log(data) // APAGAR DEPOIS
@@ -43,7 +38,7 @@ const PlantaPage = ({ navigation }) => {
 
     const regarPlanta = async () => {
         try {
-            const response = await api.put(`/planta/rega/2`);
+            const response = await api.put(`/planta/rega/${user.codCliente}`);
             const data = await response.data;
             const message = await response.data.message;
 
@@ -64,7 +59,7 @@ const PlantaPage = ({ navigation }) => {
              
     const coletarPlanta = async () => {
         try {
-            const response = await api.post(`/planta/coleta/2`);
+            const response = await api.post(`/planta/coleta/${user.codCliente}`);
     
             if (response.status === 200) {
                 const message = await response.data.message;
@@ -105,19 +100,51 @@ const PlantaPage = ({ navigation }) => {
     }
 
     //disabled={plantaData.estagio != 4}
-    return(
-        <View style={styles.Area}>
-            <TouchableOpacity style={styles.area_planta} onPress={plantaData.estagio === 4 ? coletarPlanta : regarPlanta}>
-                <Image source={
-                        plantaData.estagio === 4 ? planta4 :
-                        plantaData.estagio === 3 ? planta3 :
-                        plantaData.estagio === 2 ? planta2 :
-                        plantaData.estagio === 1 ? planta1 :
-                        planta0
-                    } style={styles.planta}/>
+    return (
+        <>
+          <Header title="Planta" />
+          <View style={styles.Area}>
+            <Image
+              source={
+                plantaData.estagio === 4 ? planta4 :
+                plantaData.estagio === 3 ? planta3 :
+                plantaData.estagio === 2 ? planta2 :
+                plantaData.estagio === 1 ? planta1 :
+                planta0
+              }
+              style={styles.planta}
+            />
+      
+            {/* Botão de Coletar Planta */}
+            <TouchableOpacity
+              style={styles.botaoColetar}
+              onPress={() => {
+                if (plantaData.estagio === 4) {
+                  coletarPlanta();
+                } else {
+                  Alert.alert("Aviso", "A planta não está pronta para coleta.");
+                }
+              }}
+            >
+              <Text style={styles.textoBotao}>Colher Planta</Text>
             </TouchableOpacity>
-        </View>
-    );
+      
+            {/* Botão de Regar Planta */}
+            <TouchableOpacity
+              style={styles.botaoRegar}
+              onPress={() => {
+                if (plantaData.estagio === 4) {
+                  Alert.alert("Aviso", "A planta já está no estágio máximo.");
+                } else {
+                  regarPlanta();
+                }
+              }}
+            >
+              <Text style={styles.textoBotao}>Regar Planta</Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      );
 };
 
 export default PlantaPage;
