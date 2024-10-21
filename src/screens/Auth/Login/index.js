@@ -5,11 +5,13 @@ import logoNova from '../../../assets/images/logoNova.png';
 import userGray from '../../../assets/icons/userGray.png';
 import passwordGray from '../../../assets/icons/passwordGray.png';
 import { AuthContext } from '../../../context/auth';
+import Feather from '@expo/vector-icons/Feather';
 
 export default function Login({ navigation }) {
     const { login } = useContext(AuthContext);
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
+    const [passwordVisible, setPasswordVisible] = useState(true)
 
     const handleLogin = () => {
         if (email && senha) {
@@ -81,7 +83,14 @@ export default function Login({ navigation }) {
                                     style={LocalStyles.textInput}
                                     placeholder='Sua senha'
                                     placeholderTextColor='#5c5c5c'
-                                    secureTextEntry={true}
+                                    secureTextEntry={passwordVisible}
+                                />
+                                <Feather
+                                    size={22}
+                                    name={passwordVisible ? 'eye' : 'eye-off'}
+                                    color='#5c5c5c'
+                                    style={{ marginRight: 10 }}
+                                    onPress={() => setPasswordVisible(!passwordVisible)}
                                 />
                             </View>
 

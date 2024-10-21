@@ -23,7 +23,7 @@ const Home = ({ navigation }) => {
             const response = await api.get(`/quizAccess`, { params: { codCliente: user.codCliente, dataResposta: hoje } });
 
             if (response.data && response.data.length > 0) {
-                Alert.alert('Acesso restrito.', 'Você já respondeu ao quiz hoje!');
+                Alert.alert(' Volte amanhã!', 'Você já respondeu ao quiz hoje.');
             } else {
                 navigation.navigate('QuizLevels');
             }

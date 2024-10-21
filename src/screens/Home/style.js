@@ -21,13 +21,11 @@ export const styles = StyleSheet.create({
         padding: 10,
         justifyContent: 'center',
         gap: 5,
-        fontSize: 18,
         color: '#fff',
         fontWeight: 'bold'
     },
     welcome: {
         fontWeight: 'bold',
-        fontSize: 20,
         color: '#ddd'
     },
     bottomContainer: {
@@ -60,7 +58,6 @@ export const styles = StyleSheet.create({
     },
     quizTitle: {
         color: '#000',
-        fontSize: 18,
         marginLeft: 5
     }
 })

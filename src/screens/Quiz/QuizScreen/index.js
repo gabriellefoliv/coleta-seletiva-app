@@ -83,6 +83,7 @@ const QuizScreen = ({ navigation }) => {
                         ) : (
                             <LottieView
                                 autoPlay
+
                                 style={{
                                     width: 150,
                                     height: 150,

@@ -15,7 +15,7 @@ const App = () => {
     <AuthProvider>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="Login" component={Login} options={{ gestureEnabled: false }} />
           <Stack.Screen name="SignUp" component={SignUp} />
           <Stack.Screen name="Home" component={Home} options={{ gestureEnabled: false }} />
           <Stack.Screen name="QuizLevels" component={QuizLevels} />

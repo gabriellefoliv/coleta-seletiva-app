@@ -43,7 +43,21 @@ export default function RegisterStep({ qrCodeData, onRegisterSuccess }) {
             Alert.alert('Sucesso', 'Cadastro realizado com sucesso! Faça login.');
             onRegisterSuccess();
         } catch (error) {
-            Alert.alert('Erro', 'Erro ao cadastrar. Tente novamente.');
+            // Verificar se a resposta do erro está disponível
+            if (error.response) {
+                // Verificar a mensagem de erro específica retornada pelo backend
+                const errorMessage = error.response.data.error;
+
+                if (errorMessage.includes('CPF não encontrado')) {
+                    Alert.alert('Erro', 'CPF inválido');
+                } else if (errorMessage.includes('Email já cadastrado')) {
+                    Alert.alert('Erro', 'Email já cadastrado no sistema.');
+                } else {
+                    Alert.alert('Erro', 'Erro ao cadastrar. Tente novamente.');
+                }
+            } else {
+                Alert.alert('Erro', 'Erro ao cadastrar. Tente novamente.');
+            }
         }
     };
 
