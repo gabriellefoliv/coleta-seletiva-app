@@ -1,21 +1,35 @@
 import React, { useContext } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View, StatusBar } from 'react-native';
 import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from './style';
 import { AuthContext } from '../../context/auth';
+import { useNavigation } from '@react-navigation/native';
 
-const Header = ({ title, navigation, showBackButton = true }) => {
+const Header = ({ title, showBackButton = true }) => {
     const { logout } = useContext(AuthContext);
+    const navigation = useNavigation();
 
     const handleLogout = () => {
         logout();
         navigation.navigate('Login');
     };
 
+    const handleGoBack = () => {
+        if(navigation && navigation.canGoBack()) {
+            console.log("Voltou pagina");
+            navigation.goBack();
+        } else {
+            console.log("Voltou para Home");
+            navigation.navigate('Home');
+        }
+    }
+
     return (
+        <>
+        <StatusBar translucent={true} backgroundColor={'transparent'} />
         <View style={[styles.container, !showBackButton && { backgroundColor: '#00907a', color: '#fff' }]}>
             {showBackButton && (
-                <TouchableOpacity onPress={() => navigation.goBack()}>
+                <TouchableOpacity onPress={handleGoBack}>
                     <AntDesign name='arrowleft' size={24} color='black' />
                 </TouchableOpacity>
             )}
@@ -26,6 +40,7 @@ const Header = ({ title, navigation, showBackButton = true }) => {
                 <MaterialCommunityIcons name='logout' size={30} color='black' />
             </TouchableOpacity>
         </View>
+        </>
     );
 };
 

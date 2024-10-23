@@ -1,7 +1,8 @@
 import axios from "axios";
+import { API_URL } from "@env"; 
 
 export const api = axios.create({
-    baseURL: 'http://172.20.10.2:3000'
+    baseURL: API_URL
 })
 
 export const createSession = async (email, senha) => {

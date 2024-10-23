@@ -142,7 +142,8 @@ export default StyleSheet.create({
     },
 
     logo: {
-        marginTop: 100,
+        marginTop: '20%',
+        marginRight: '15%',
         width: SIZES.width * 0.60,
         height: SIZES.width * 0.48,
     },
@@ -160,12 +161,12 @@ export default StyleSheet.create({
     },
 
     bottom: {
-        //bottom: -SIZES.height*0.6, 
+        bottom: '1%', 
         width: '100%',
         //height: '10%', 
         alignItems: 'center',
-        justifyContent: 'flex-end',
-        paddingBottom: 7
+        //justifyContent: 'flex-end',
+        position:'absolute',
         //backgroundColor: '#4a4'
     }
 

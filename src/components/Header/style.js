@@ -7,9 +7,10 @@ export const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-around",
-        padding: 20,
-        paddingTop: 50,
-        backgroundColor: 'transparent'
+        padding: 15,
+        paddingTop: 10,
+        backgroundColor: 'transparent',
+        marginTop: '8%',
     },
     title: {
         color: "#000",

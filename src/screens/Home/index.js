@@ -97,6 +97,12 @@ const Home = ({ navigation }) => {
                             Ranking
                         </Text>
                     </TouchableOpacity>
+                    <TouchableOpacity style={styles.quizButton} onPress={() => navigation.navigate("Planta")}>
+                        <FontAwesome5 size={22} name="trophy" color="black" />
+                        <Text style={styles.quizTitle}>
+                            Planta
+                        </Text>
+                    </TouchableOpacity>
                 </View>
             </View >
         </>
