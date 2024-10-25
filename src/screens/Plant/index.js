@@ -79,7 +79,7 @@ const PlantaPage = ({ navigation }) => {
             }
         } catch (error) {
             console.error("Erro ao coletar planta:", error);
-            alert("Erro ao coletar planta.");
+            Alert.alert("Error", "Erro ao colher a planta, pedimos desculpas");
         };
     };
 

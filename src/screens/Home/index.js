@@ -33,6 +33,17 @@ const Home = ({ navigation }) => {
         }
     };
 
+    const fetchTotalPontos = async () => {
+        if (user && user.codCliente) {
+            try {
+                const response = await api.get(`/pontos/${user.codCliente}`);
+                setPontos(response.data[0].totalPontos); // Atribui os pontos do cliente logado
+            } catch (error) {
+                console.error("Erro ao carregar os pontos: ", error);
+            }
+        }
+    };
+
     const fetchPontos = async () => {
         if (user && user.codCliente) {
             try {
@@ -56,7 +67,7 @@ const Home = ({ navigation }) => {
 
     useFocusEffect(
         useCallback(() => {
-            fetchPontos();
+            fetchTotalPontos();
         }, [user])
     );
 
@@ -77,7 +88,7 @@ const Home = ({ navigation }) => {
                     />
                     <View >
                         <Text style={styles.topText}>
-                            Total de pontos:
+                            Pontos:
                         </Text>
                         <Text style={styles.topText}>
                             {pontos} pts
@@ -97,10 +108,16 @@ const Home = ({ navigation }) => {
                             Ranking
                         </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.quizButton} onPress={() => navigation.navigate("Planta")}>
+                    <TouchableOpacity style={styles.quizButton} onPress={() => navigation.navigate("Plant")}>
                         <FontAwesome5 size={22} name="trophy" color="black" />
                         <Text style={styles.quizTitle}>
                             Planta
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.quizButton} onPress={() => navigation.navigate("Transaction")}>
+                        <FontAwesome5 size={22} name="trophy" color="black" />
+                        <Text style={styles.quizTitle}>
+                            Transferência
                         </Text>
                     </TouchableOpacity>
                 </View>

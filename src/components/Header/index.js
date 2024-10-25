@@ -16,10 +16,8 @@ const Header = ({ title, showBackButton = true }) => {
 
     const handleGoBack = () => {
         if(navigation && navigation.canGoBack()) {
-            console.log("Voltou pagina");
             navigation.goBack();
         } else {
-            console.log("Voltou para Home");
             navigation.navigate('Home');
         }
     }
