@@ -9,6 +9,7 @@ import QuizScreen from './src/screens/Quiz/QuizScreen';
 import { QuizLevels } from './src/screens/Quiz/QuizLevels';
 import Plant from './src/screens/Plant';
 import Transaction from './src/screens/Transaction';
+import HistoricoColetas from "./src/screens/HistoricoColetas";
 
 const Stack = createNativeStackNavigator();
 
@@ -25,6 +26,7 @@ const App = () => {
           <Stack.Screen name="Ranking" component={Ranking} />
           <Stack.Screen name="Plant" component={Plant} />
           <Stack.Screen name="Transaction" component={Transaction} />
+          <Stack.Screen name="HistoricoColetas" component={HistoricoColetas} />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthProvider>

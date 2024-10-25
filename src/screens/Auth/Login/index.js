@@ -13,13 +13,17 @@ export default function Login({ navigation }) {
     const [senha, setSenha] = useState('');
     const [passwordVisible, setPasswordVisible] = useState(true)
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         if (email && senha) {
-            console.log('Dados de login enviados:', { email, senha });
-            login({ email, senha });
-            navigation.replace('Home');
+            try {
+                await login({ email, senha });
+                // O redirecionamento ocorre ao final, após o login bem-sucedido
+                navigation.replace('Home');
+            } catch (error) {
+                console.error("Erro ao tentar logar:", error);
+            }
         } else {
-            console.error('Por favor, preencha todos os campos.');
+            Alert.alert("Campos obrigatórios", "Por favor, preencha todos os campos.");
         }
     };
 

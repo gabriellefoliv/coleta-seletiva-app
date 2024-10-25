@@ -13,16 +13,18 @@ export const QuizLevels = ({ navigation }) => {
             console.log(`Verificando perguntas: codCliente=${user.codCliente}, dificuldade=${dificuldade}`);
 
             const response = await api.get(`/quiz?codCliente=${user.codCliente}&dificuldade=${dificuldade}`);
-            if (response.data.message === "Sem perguntas disponíveis para o nível selecionado.") {
+            navigation.navigate("QuizScreen", { dificuldade });
+
+        } catch (error) {
+            if (error.response && error.response.status === 404 && error.response.data.message === "Sem perguntas disponíveis para o nível selecionado.") {
                 Alert.alert("Atenção", "Não há perguntas disponíveis para este nível.");
             } else {
-                navigation.navigate("QuizScreen", { dificuldade });
+                console.error("Erro ao verificar perguntas disponíveis", error);
+                Alert.alert("Erro", "Houve um problema ao carregar as perguntas. Tente novamente mais tarde.");
             }
-        } catch (error) {
-            console.error("Erro ao verificar perguntas disponíveis", error);
-            Alert.alert("Erro", "Houve um problema ao carregar as perguntas. Tente novamente mais tarde.");
         }
     };
+
 
     return (
         <>

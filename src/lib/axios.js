@@ -1,8 +1,7 @@
 import axios from "axios";
-import { API_URL } from "@env"; 
 
 export const api = axios.create({
-    baseURL: API_URL
+    baseURL: process.env.baseURL
 })
 
 export const createSession = async (email, senha) => {
@@ -12,7 +11,7 @@ export const createSession = async (email, senha) => {
         console.log("Resposta da API de login:", response.data);
         return response;
     } catch (error) {
-        if (error.response && error.response.status === 401) {
+        if (error.response?.status === 401) {
             console.error("Credenciais inválidas:", error.response.data);
         } else {
             console.error("Erro desconhecido:", error.message);

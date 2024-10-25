@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import { api, createSession } from "../lib/axios";
+import { Alert } from "react-native";
 
 export const AuthContext = createContext();
 
@@ -13,7 +14,11 @@ export const AuthProvider = ({ children }) => {
             setUser(response.data.cliente);
             console.log("Usuário após login:", response.data.cliente);
         } catch (error) {
-            console.error("Erro no login:", error);
+            if (error.response?.status === 401) {
+                Alert.alert("Erro de Login", "Email ou senha incorretos. Tente novamente.");
+            } else {
+                Alert.alert("Erro", "Não foi possível fazer login. Verifique sua conexão e tente novamente.");
+            }
         }
     }
 

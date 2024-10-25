@@ -1,7 +1,7 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
+import { Entypo, FontAwesome5, FontAwesome6, MaterialIcons } from '@expo/vector-icons';
 import { AuthContext } from "../../context/auth";
 import { api } from "../../lib/axios";
 import { styles } from "./style";
@@ -97,27 +97,33 @@ const Home = ({ navigation }) => {
                 </View>
                 <View style={styles.bottomContainer}>
                     <TouchableOpacity style={styles.quizButton} onPress={handleAccessQuiz}>
-                        <MaterialIcons name="quiz" size={22} color="black" />
+                        <MaterialIcons name="quiz" size={22} color="#00907a" />
                         <Text style={styles.quizTitle}>
                             Acessar Quiz
                         </Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.quizButton} onPress={() => navigation.navigate("Ranking")}>
-                        <FontAwesome5 size={22} name="trophy" color="black" />
+                        <FontAwesome5 size={22} name="trophy" color="#00907a" />
                         <Text style={styles.quizTitle}>
                             Ranking
                         </Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.quizButton} onPress={() => navigation.navigate("Plant")}>
-                        <FontAwesome5 size={22} name="trophy" color="black" />
+                        <FontAwesome6 size={22} name="plant-wilt" color="#00907a" />
                         <Text style={styles.quizTitle}>
                             Planta
                         </Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.quizButton} onPress={() => navigation.navigate("Transaction")}>
-                        <FontAwesome5 size={22} name="trophy" color="black" />
+                        <Entypo size={22} name="credit" color="#00907a" />
                         <Text style={styles.quizTitle}>
                             Transferência
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.quizButton} onPress={() => navigation.navigate("HistoricoColetas")}>
+                        <FontAwesome5 size={22} name="history" color="#00907a" />
+                        <Text style={styles.quizTitle}>
+                            Histórico de Coletas
                         </Text>
                     </TouchableOpacity>
                 </View>
