@@ -12,7 +12,13 @@ export const styles = StyleSheet.create({
         marginTop: -30,
         width: 250,
         height: 250,
-        marginBottom: 20,
+    },
+    dateText: {
+        fontSize: 18,
+        color: "#fff",
+        fontWeight: 'bold',
+        marginBottom: 12,
+        textAlign: 'center'
     },
     title: {
         width: '100%',
@@ -87,5 +93,28 @@ export const styles = StyleSheet.create({
         width: 60,
         fontSize: 16,
         textAlign: 'right',
+    },
+    totalCard: {
+        width: '100%',
+        backgroundColor: '#fff',
+        padding: 20,
+        marginBottom: 20,
+        borderRadius: 10,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOpacity: 0.2,
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: 4,
+        elevation: 4,
+    },
+    totalText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    totalPeso: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#00907a',
     },
 });

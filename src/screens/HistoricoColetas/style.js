@@ -6,7 +6,7 @@ export const styles = StyleSheet.create({
         padding: 16,
         backgroundColor: '#00907a',
         alignItems: 'center',
-        paddingTop: 100,
+        paddingTop: 30,
 
     },
     coletaContainer: {
@@ -150,5 +150,11 @@ export const styles = StyleSheet.create({
         textAlign: 'center',
     },
     separator: {
+    },
+    positionText: {
+        fontSize: 18,
+        color: "#333",
+        textAlign: "center",
+        marginVertical: 8
     },
 })
