@@ -115,7 +115,6 @@ const PlantaPage = ({ navigation }) => {
             <>
             <Header navigation={navigation} title="Planta" />
                 <View style={styles.Area}>
-                <GradientBackground/>
                     <TouchableOpacity style={styles.area_planta}>
                         <Image
                             source={

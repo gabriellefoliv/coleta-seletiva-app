@@ -1,7 +1,7 @@
 import { api } from "../../lib/axios";
 import { AuthContext } from "../../context/auth";
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, Modal } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import styles from './style';
 import Header from "../../components/Header";
@@ -16,8 +16,14 @@ const Transaction = ({ navigation }) => {
     const [partners, setPartners] = useState([]);
     const [partner, setPartner] = useState('');  // Adicionando o estado do parceiro
     const [isloading, setIsLoading] = useState(true);
+    const [isModalVisible, setIsModalVisible] = useState(false);
 
     const handleTransfer = () => {
+        setIsModalVisible(true); // Exibe o modal de confirmação
+    };
+
+    const confirmTransfer = () => {
+        setIsModalVisible(false); // Oculta o modal
         Alert.alert("Sucesso", "Pontos transferidos com sucesso.");
         // Aqui pode ser implementada a lógica de transferência de pontos
     };
@@ -60,52 +66,77 @@ const Transaction = ({ navigation }) => {
     else {
         return (
             <>
-            <Header navigation={navigation} title="Transferir" />
-            <View style={styles.container}>
-            <Text style={styles.title}>Transferência de Pontos</Text>
-          
-            {/* Texto de total de pontos do cliente */}
-            <View style={styles.pointsContainer}>
-                <Text style={styles.pointsText}>Pontos : </Text>
-                <Text style={styles.points}>{totalPontos} pts.</Text>
-            </View>
+    <Header navigation={navigation} title="Transferir" />
+    <View style={styles.container}>
+        <View style={styles.totalCard}>
+            <Text style={styles.totalText}>Total de Pontos:</Text>
+            <Text style={styles.totalPeso}>{totalPontos} pts.</Text>
+        </View>
 
-            {/* Input para inserir os pontos a transferir */}
-            <TextInput
-                style={styles.input}
-                placeholder="Insira a quantidade de pontos"
-                keyboardType="numeric"
-                value={pontos}
-                onChangeText={setPontos}
-            />
-    
-            {/* Dropdown para escolher o parceiro */}
-            <Picker
-                selectedValue={partner}
-                style={styles.picker}
-                onValueChange={(itemValue) => setPartner(itemValue)}  // Define o codParceiro
-                >
-                <Picker.Item label="Selecione um parceiro" value="" />
-                {partners.map((partnerItem) => (
-                    <Picker.Item
-                    key={partnerItem.codParceiro}  // Define uma chave única
-                    label={partnerItem.nome}       // Mostra o nome do parceiro
-                    value={partnerItem.codParceiro} // Armazena o codParceiro como valor
+        {/* Input para inserir os pontos a transferir */}
+        <TextInput
+            style={styles.input}
+            placeholder="Insira a quantidade de pontos"
+            keyboardType="numeric"
+            value={pontos}
+            onChangeText={setPontos}
+        />
+
+        {/* Dropdown para escolher o parceiro */}
+        <Picker
+            selectedValue={partner}
+            style={styles.picker}
+            onValueChange={(itemValue) => setPartner(itemValue)}
+        >
+            <Picker.Item label="Selecione um parceiro" value="" />
+            {partners.map((partnerItem) => (
+                <Picker.Item
+                    key={partnerItem.codParceiro}
+                    label={partnerItem.nome}
+                    value={partnerItem.codParceiro}
                 />
-                ))}
-            </Picker>
-    
-            {/* Botão para enviar a transferência */}
-            <TouchableOpacity style={styles.button} onPress={handleTransfer}>
-                <Text style={styles.buttonText}>Enviar Transferência</Text>
-            </TouchableOpacity>
-    
-            {/* Botão para acessar o histórico de transações */}
-            <TouchableOpacity style={styles.historyButton} onPress={goToHistory}>
-                <Text style={styles.historyButtonText}>Histórico de Transações</Text>
-            </TouchableOpacity>
-            </View>
-            </>
+            ))}
+        </Picker>
+
+        {/* Botão para enviar a transferência */}
+        <TouchableOpacity style={styles.button} onPress={handleTransfer}>
+            <Text style={styles.buttonText}>Transferir</Text>
+        </TouchableOpacity>
+
+        {/* Botão para acessar o histórico de transações */}
+        <TouchableOpacity style={styles.historyButton} onPress={goToHistory}>
+            <Text style={styles.historyButtonText}>Histórico de Transações</Text>
+        </TouchableOpacity>
+        {/* Modal de confirmação */}
+        <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={isModalVisible}
+                        onRequestClose={() => setIsModalVisible(false)}
+                    >
+                        <View style={styles.modalContainer}>
+                            <View style={styles.modalContent}>
+                                <Text style={styles.modalText}>Confirma a transferência de {pontos} pontos para o parceiro selecionado?</Text>
+
+                                <View style={styles.modalButtons}>
+                                    <TouchableOpacity
+                                        style={styles.modalButton}
+                                        onPress={confirmTransfer}
+                                    >
+                                        <Text style={styles.modalButtonText}>Confirmar</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={[styles.modalButton, { backgroundColor: '#ccc' }]}
+                                        onPress={() => setIsModalVisible(false)}
+                                    >
+                                        <Text style={styles.modalButtonText}>Cancelar</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
+    </View>
+</>
         );
     }
 

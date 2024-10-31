@@ -10,6 +10,14 @@ const Ranking = ({ navigation }) => {
     const [ranking, setRanking] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    const formatName = (name) => {
+        const parts = name.split(" ");
+        if (parts.length > 1) {
+            return `${parts[0]} ${parts[parts.length - 1]}`; // Retorna o primeiro nome e o último sobrenome
+        }
+        return name; // Caso o nome tenha apenas uma palavra
+    };
+
     useEffect(() => {
         const fetchRanking = async () => {
             try {
@@ -44,10 +52,10 @@ const Ranking = ({ navigation }) => {
                 <View style={styles.rankingContainer}>
                     <View style={styles.rankingItem}>
                         <Text style={styles.position}>Pos</Text>
-                        <Text style={styles.separator}>|</Text>
+                        <Text style={styles.separatorLeft}>|</Text>
                         <Text style={styles.headerText}>Cliente</Text>
-                        <Text style={styles.separator}>|</Text>
-                        <Text style={styles.points}>Pontos</Text>
+                        <Text style={styles.separatorRight}>|</Text>
+                        <Text style={styles.points}>Total Acumulado</Text>
                     </View>
                     <FlatList
                         data={ranking}

@@ -11,6 +11,8 @@ import Header from "../../components/Header";
 const Home = ({ navigation }) => {
     const { user } = useContext(AuthContext);
     const [pontos, setPontos] = useState(0);
+    const [position, setPosition] = useState([]);
+    const [coleta, setColeta] = useState([]);
 
     const handleAccessQuiz = async () => {
         if (!user || !user.codCliente) {
@@ -37,6 +39,7 @@ const Home = ({ navigation }) => {
         if (user && user.codCliente) {
             try {
                 const response = await api.get(`/pontos/${user.codCliente}`);
+                console.log("Retorno de pontos:", response.data);
                 setPontos(response.data[0].totalPontos); // Atribui os pontos do cliente logado
             } catch (error) {
                 console.error("Erro ao carregar os pontos: ", error);
@@ -44,7 +47,32 @@ const Home = ({ navigation }) => {
         }
     };
 
-    const fetchPontos = async () => {
+    const fetchPosition = async () => {
+        try{
+            //setPosition(1);
+            const response = await api.get(`/ranking/${user.codCliente}`);
+            //console.log("Retorno do ranking:",response.data.position);
+            setPosition(response.data.position);
+        } catch (error) {
+            console.error("Erro ao carregar a posição", error);
+        }
+    }
+
+    const fetchColeta = async () => {
+        try{
+            //setColeta(1000);
+            const response = await api.get(`/coletaTotal/${user.codCliente}`);
+            //console.log("Retorno da coleta Total:",response.data[0].totalPeso)
+            setColeta(response.data[0].totalPeso);
+        } catch (error) {
+            console.error("Erro ao carregar a posição", error);
+            if (error.status === 404){
+                setColeta(0);
+            } 
+        }
+    }
+
+    const fetchPontos = useCallback(async () => {
         if (user && user.codCliente) {
             try {
                 const response = await api.get(`/ranking`, {
@@ -63,13 +91,26 @@ const Home = ({ navigation }) => {
                 console.error("Erro ao carregar os pontos: ", error);
             }
         }
-    };
+    }, [user]);
 
     useFocusEffect(
         useCallback(() => {
             fetchTotalPontos();
         }, [user])
     );
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchPosition();
+        }, [user])
+    );
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchColeta();
+        }, [user])
+    );
+
 
     if (!user) {
         return <Text>Carregando...</Text>;
@@ -80,54 +121,35 @@ const Home = ({ navigation }) => {
             <Header title={`Olá, ${user.nome}`} showBackButton={false} />
             <View style={styles.container}>
                 <View style={styles.topContainer}>
-                    <QRCode
-                        value={user.codCliente.toString()}
-                        size={150}
-                        color="white"
-                        backgroundColor="#00907a"
-                    />
-                    <View >
-                        <Text style={styles.topText}>
-                            Pontos:
-                        </Text>
-                        <Text style={styles.topText}>
-                            {pontos} pts
-                        </Text>
+                    <View>
+                        <Text style={styles.topText}>Pontos : {pontos} pts</Text>
+                        <Text style={styles.topText}>Total Coletado : {coleta} kg</Text>
+                        <Text style={styles.topText}>Posição no Ranking : {position}º</Text>
                     </View>
                 </View>
                 <View style={styles.bottomContainer}>
-                    <TouchableOpacity style={styles.quizButton} onPress={handleAccessQuiz}>
-                        <MaterialIcons name="quiz" size={22} color="#00907a" />
-                        <Text style={styles.quizTitle}>
-                            Acessar Quiz
-                        </Text>
-                    </TouchableOpacity>
                     <TouchableOpacity style={styles.quizButton} onPress={() => navigation.navigate("Ranking")}>
                         <FontAwesome5 size={22} name="trophy" color="#00907a" />
-                        <Text style={styles.quizTitle}>
-                            Ranking
-                        </Text>
+                        <Text style={styles.quizTitle}>Ranking</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.quizButton} onPress={handleAccessQuiz}>
+                        <MaterialIcons name="quiz" size={22} color="#00907a" />
+                        <Text style={styles.quizTitle}>Acessar Quiz</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.quizButton} onPress={() => navigation.navigate("Plant")}>
                         <FontAwesome6 size={22} name="plant-wilt" color="#00907a" />
-                        <Text style={styles.quizTitle}>
-                            Planta
-                        </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.quizButton} onPress={() => navigation.navigate("Transaction")}>
-                        <Entypo size={22} name="credit" color="#00907a" />
-                        <Text style={styles.quizTitle}>
-                            Transferência
-                        </Text>
+                        <Text style={styles.quizTitle}>Planta</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.quizButton} onPress={() => navigation.navigate("HistoricoColetas")}>
                         <FontAwesome5 size={22} name="history" color="#00907a" />
-                        <Text style={styles.quizTitle}>
-                            Histórico de Coletas
-                        </Text>
+                        <Text style={styles.quizTitle}>Histórico de Coletas</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.quizButton} onPress={() => navigation.navigate("Transaction")}>
+                        <Entypo size={22} name="credit" color="#00907a" />
+                        <Text style={styles.quizTitle}>Transferência</Text>
                     </TouchableOpacity>
                 </View>
-            </View >
+            </View>
         </>
     )
 }

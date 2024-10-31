@@ -7,7 +7,7 @@ export const styles = StyleSheet.create({
         flex: 1, 
         justifyContent: 'center', 
         alignItems: 'center',
-        background: 'linear-gradient(to bottom, #00907a, white)',
+        backgroundColor: '#fff',
         //backgroundColor: '#c7edfc'
     },
     Text:{
@@ -48,7 +48,7 @@ export const styles = StyleSheet.create({
         color: 'gray'
     },
     botao: {
-        backgroundColor: 'rgba(50, 144, 122, 0.7)',
+        backgroundColor: '#00907a',
         padding: 15,
         borderRadius: 10,
         marginBottom: 20, // Espaçamento entre os botões

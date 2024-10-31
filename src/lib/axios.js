@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-    baseURL: process.env.baseURL
+    baseURL: 'http://192.168.1.65:5000'
 })
 
 export const createSession = async (email, senha) => {

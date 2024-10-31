@@ -7,34 +7,25 @@ export const styles = StyleSheet.create({
     },
     topContainer: {
         width: '100%',
-        height: 300,
+        paddingVertical: 30,
         backgroundColor: '#00907a',
-        borderEndEndRadius: 20,
-        padding: 20,
+        borderBottomEndRadius: 20,
+        borderBottomStartRadius: 20,
+        paddingHorizontal: 20,
         justifyContent: 'center',
-        flexDirection: 'row',
-        alignItems: 'center'
+        alignItems: 'flex-start',
     },
     topText: {
-        flexDirection: 'column',
-        marginLeft: 20,
-        padding: 10,
-        justifyContent: 'center',
-        gap: 5,
+        fontSize: 18,
         color: '#fff',
-        fontWeight: 'bold'
-    },
-    welcome: {
         fontWeight: 'bold',
-        color: '#ddd'
+        marginVertical: 5,
     },
     bottomContainer: {
         marginTop: 20,
         width: '100%',
-        height: 'auto',
         justifyContent: 'center',
         alignItems: 'center',
-
     },
     quizButton: {
         padding: 18,
@@ -43,21 +34,22 @@ export const styles = StyleSheet.create({
         borderRadius: 10,
         marginTop: 10,
         flexDirection: 'row',
+        alignItems: 'center',
         justifyContent: 'center',
         gap: 10,
-        // Sombra para iOS
-        shadowColor: "#000",
+        shadowColor: "#000", // Sombra para iOS
         shadowOffset: {
             width: 0,
             height: 5,
         },
         shadowOpacity: 0.2,
         shadowRadius: 10,
-        // Sombra para Android
-        elevation: 5,
+        elevation: 5, // Sombra para Android
     },
     quizTitle: {
         color: '#000',
-        marginLeft: 5
-    }
-})
+        marginLeft: 5,
+        fontSize: 16,
+        fontWeight: '500',
+    },
+});
