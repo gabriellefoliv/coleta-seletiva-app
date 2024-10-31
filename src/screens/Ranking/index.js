@@ -64,7 +64,7 @@ const Ranking = ({ navigation }) => {
                             <View style={styles.rankingItem}>
                                 <Text style={styles.position}>{index + 1}º</Text>
                                 <Text style={styles.separator}>|</Text>
-                                <Text style={styles.name}>{item.nome}</Text>
+                                <Text style={styles.name}>{formatName(item.nome)}</Text>
                                 <Text style={styles.separator}>|</Text>
                                 <Text style={styles.points}>{item.total_pontos} pts</Text>
                             </View>
