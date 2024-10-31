@@ -5,6 +5,9 @@ import { StatusBar } from 'expo-status-bar';
 import { COLORS, FONTS, SIZES } from '../../assets/theme';
 import logoNova from '../../assets/images/logoNova.png';
 import userGray from '../../assets/icons/userGray.png'
+import cpfImg from '../../assets/icons/cpf.jpg';
+import emailImg from '../../assets/icons/email.png';
+import senhaImg from '../../assets/icons/senha.png';
 
 
 export default function RegisterStep({ qrCodeData, onRegisterSuccess }) {
@@ -13,27 +16,29 @@ export default function RegisterStep({ qrCodeData, onRegisterSuccess }) {
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
 
+    const formattedCpf = cpf.replace(/\D/g, ''); // Remove caracteres não numéricos
+
     const handleRegister = async () => {
         if (!cpf || !senha || !email || !nome) {
             Alert.alert('Erro', 'Por favor, preencha todos os campos');
             return;
         }
 
-        const codClienteNumber = parseInt(qrCodeData, 10);
+        const codClienteNumber = parseInt(qrCodeData, 10); // Garante que codCliente é um número inteiro
 
         console.log('Dados a serem enviados:', {
             codCliente: codClienteNumber,
             nome,
-            cpf,
+            cpf: formattedCpf, // Formata o CPF
             email,
             senha
         });
 
         try {
             const response = await api.post('/clientes/cadastro', {
-                codCliente: codClienteNumber,
+                codCliente: codClienteNumber, // Envia o número inteiro
                 nome,
-                cpf,
+                cpf: formattedCpf, // Envia o CPF formatado
                 email,
                 senha
             });
@@ -43,9 +48,9 @@ export default function RegisterStep({ qrCodeData, onRegisterSuccess }) {
             Alert.alert('Sucesso', 'Cadastro realizado com sucesso! Faça login.');
             onRegisterSuccess();
         } catch (error) {
-            // Verificar se a resposta do erro está disponível
+            console.error('Erro ao cadastrar:', error.response.data); // Log detalhado da resposta
+
             if (error.response) {
-                // Verificar a mensagem de erro específica retornada pelo backend
                 const errorMessage = error.response.data.error;
 
                 if (errorMessage.includes('CPF não encontrado')) {
@@ -99,7 +104,7 @@ export default function RegisterStep({ qrCodeData, onRegisterSuccess }) {
 
                             <View style={styles.textSection}>
                                 <Image
-                                    source={userGray}
+                                    source={cpfImg}
                                     resizeMode='contain'
                                     style={styles.imageIcon}
                                 />
@@ -114,7 +119,7 @@ export default function RegisterStep({ qrCodeData, onRegisterSuccess }) {
                             </View>
                             <View style={styles.textSection}>
                                 <Image
-                                    source={userGray}
+                                    source={emailImg}
                                     resizeMode='contain'
                                     style={styles.imageIcon}
                                 />
@@ -130,7 +135,7 @@ export default function RegisterStep({ qrCodeData, onRegisterSuccess }) {
                             </View>
                             <View style={styles.textSection}>
                                 <Image
-                                    source={userGray}
+                                    source={senhaImg}
                                     resizeMode='contain'
                                     style={styles.imageIcon}
                                 />

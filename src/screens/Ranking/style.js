@@ -13,6 +13,30 @@ export const styles = StyleSheet.create({
         height: 250,
         marginBottom: 20,
     },
+    dateText: {
+        fontSize: 18,
+        color: "#fff",
+        fontWeight: 'bold',
+        marginBottom: 12,
+        textAlign: 'center'
+    },
+    title: {
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        padding: 10,
+    },
+    role: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#ddd',
+    },
+    message: {
+        fontSize: 18,
+        textAlign: 'center',
+        marginTop: 20,
+        color: '#6c757d',
+    },
     rankingContainer: {
         flex: 1,
         backgroundColor: '#fff',
@@ -60,7 +84,7 @@ export const styles = StyleSheet.create({
         width: 90,
         fontWeight: 'bold',
         textAlign: 'right',
-        marginLeft:-10
+        marginLeft: -10
     },
     headerText: {
         fontSize: 14, // Reduz o tamanho da fonte do cabeçalho
@@ -71,4 +95,28 @@ export const styles = StyleSheet.create({
     rankingList: {
         paddingBottom: 40,
     },
+    totalCard: {
+        width: '100%',
+        backgroundColor: '#fff',
+        padding: 20,
+        marginBottom: 20,
+        borderRadius: 10,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOpacity: 0.2,
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: 4,
+        elevation: 4,
+    },
+    totalText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    totalPeso: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#00907a',
+    },
+
 });

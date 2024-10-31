@@ -48,7 +48,7 @@ const Home = ({ navigation }) => {
     };
 
     const fetchPosition = async () => {
-        try{
+        try {
             //setPosition(1);
             const response = await api.get(`/ranking/${user.codCliente}`);
             //console.log("Retorno do ranking:",response.data.position);
@@ -59,16 +59,16 @@ const Home = ({ navigation }) => {
     }
 
     const fetchColeta = async () => {
-        try{
+        try {
             //setColeta(1000);
             const response = await api.get(`/coletaTotal/${user.codCliente}`);
             //console.log("Retorno da coleta Total:",response.data[0].totalPeso)
             setColeta(response.data[0].totalPeso);
         } catch (error) {
             console.error("Erro ao carregar a posição", error);
-            if (error.status === 404){
+            if (error.status === 404) {
                 setColeta(0);
-            } 
+            }
         }
     }
 

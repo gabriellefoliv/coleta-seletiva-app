@@ -30,26 +30,37 @@ export default function SignUp({ navigation }) {
 
     const handleQRCodeScanned = async (data) => {
         try {
-            console.log('QRCode escaneado:', data); // Adicione este log para verificar o QRCode escaneado
+            console.log('QRCode escaneado:', data); // Log para verificar o QRCode escaneado
+            const codClienteNumber = parseInt(data, 10); // Converte o valor escaneado para inteiro
+
             const response = await api.post('/clientes/qrcode', {
-                codCliente: data
+                codCliente: codClienteNumber // Usa o número inteiro
             });
 
-            console.log('Resposta da API:', response.data); // Adicione este log para verificar a resposta
+            console.log('Resposta da API:', response.data); // Log para verificar a resposta
 
             if (response.status === 200) {
                 Alert.alert('QR Code validado com sucesso!', `${data}`);
-                setQrCodeData(data);
+                setQrCodeData(codClienteNumber); // Armazena o número inteiro no estado
                 setStep('register');
             } else {
                 const result = await response.json();
                 Alert.alert('Erro', result.error || 'QRCode não validado.');
             }
         } catch (error) {
-            console.error('Erro ao validar QR Code:', error); // Adicione este log para capturar o erro
-            Alert.alert('Erro', 'Não foi possível validar o QR Code.');
+            console.error('Erro ao validar QR Code:', error);
+
+            if (error.response) {
+                // Resposta do backend
+                console.error('Resposta do backend:', error.response.data);
+                Alert.alert('Erro', error.response.data.error || 'Não foi possível validar o QR Code.');
+            } else {
+                // Outro erro (conexão, etc.)
+                Alert.alert('Erro', 'Erro ao conectar com o servidor.');
+            }
         }
     };
+
 
     return (
         <View style={styles.container}>
