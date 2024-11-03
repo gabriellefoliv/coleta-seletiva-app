@@ -39,7 +39,6 @@ const Home = ({ navigation }) => {
         if (user && user.codCliente) {
             try {
                 const response = await api.get(`/pontos/${user.codCliente}`);
-                console.log("Retorno de pontos:", response.data);
                 setPontos(response.data[0].totalPontos); // Atribui os pontos do cliente logado
             } catch (error) {
                 console.error("Erro ao carregar os pontos: ", error);
@@ -48,10 +47,8 @@ const Home = ({ navigation }) => {
     };
 
     const fetchPosition = async () => {
-        try {
-            //setPosition(1);
+        try{
             const response = await api.get(`/ranking/${user.codCliente}`);
-            //console.log("Retorno do ranking:",response.data.position);
             setPosition(response.data.position);
         } catch (error) {
             console.error("Erro ao carregar a posição", error);
@@ -59,16 +56,14 @@ const Home = ({ navigation }) => {
     }
 
     const fetchColeta = async () => {
-        try {
-            //setColeta(1000);
+        try{
             const response = await api.get(`/coletaTotal/${user.codCliente}`);
-            //console.log("Retorno da coleta Total:",response.data[0].totalPeso)
             setColeta(response.data[0].totalPeso);
         } catch (error) {
             console.error("Erro ao carregar a posição", error);
-            if (error.status === 404) {
+            if (error.status === 404){
                 setColeta(0);
-            }
+            } 
         }
     }
 
@@ -144,7 +139,7 @@ const Home = ({ navigation }) => {
                         <FontAwesome5 size={22} name="history" color="#00907a" />
                         <Text style={styles.quizTitle}>Histórico de Coletas</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.quizButton} onPress={() => navigation.navigate("Transaction")}>
+                    <TouchableOpacity style={styles.quizButton} onPress={() => navigation.navigate("Transacao")}>
                         <Entypo size={22} name="credit" color="#00907a" />
                         <Text style={styles.quizTitle}>Transferência</Text>
                     </TouchableOpacity>

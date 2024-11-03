@@ -8,8 +8,9 @@ import Ranking from './src/screens/Ranking';
 import QuizScreen from './src/screens/Quiz/QuizScreen';
 import { QuizLevels } from './src/screens/Quiz/QuizLevels';
 import Plant from './src/screens/Plant';
-import Transaction from './src/screens/Transaction';
+import Transacao from './src/screens/Transacao';
 import HistoricoColetas from "./src/screens/HistoricoColetas";
+import HistoricoTransacoes from "./src/screens/HistoricoTransacoes";
 
 const Stack = createNativeStackNavigator();
 
@@ -25,8 +26,9 @@ const App = () => {
           <Stack.Screen name="QuizScreen" component={QuizScreen} />
           <Stack.Screen name="Ranking" component={Ranking} />
           <Stack.Screen name="Plant" component={Plant} />
-          <Stack.Screen name="Transaction" component={Transaction} />
+          <Stack.Screen name="Transacao" component={Transacao} />
           <Stack.Screen name="HistoricoColetas" component={HistoricoColetas} />
+          <Stack.Screen name="HistoricoTransacoes" component={HistoricoTransacoes} />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthProvider>

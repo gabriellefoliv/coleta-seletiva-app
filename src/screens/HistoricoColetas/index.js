@@ -134,7 +134,7 @@ const HistoricoColetas = () => {
                 </View>
                 {position !== null && (
                     <View style={styles.totalCard}>
-                        <Text style={styles.totalText}>Sua posição no Ranking de Coletas é:</Text>
+                        <Text style={styles.totalText}>Sua posição no Ranking de Coletas atual é:</Text>
                         <Text style={styles.totalPeso}>{position}º</Text>
                     </View>
                 )}

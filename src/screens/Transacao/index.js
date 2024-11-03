@@ -7,7 +7,7 @@ import styles from './style';
 import Header from "../../components/Header";
 
 
-const Transaction = ({ navigation }) => {
+const Transacao = ({ navigation }) => {
 
     const { user } = useContext(AuthContext);
 
@@ -104,7 +104,7 @@ const Transaction = ({ navigation }) => {
         </TouchableOpacity>
 
         {/* Botão para acessar o histórico de transações */}
-        <TouchableOpacity style={styles.historyButton} onPress={goToHistory}>
+        <TouchableOpacity style={styles.historyButton} onPress={() => navigation.navigate("HistoricoTransacoes")}>
             <Text style={styles.historyButtonText}>Histórico de Transações</Text>
         </TouchableOpacity>
         {/* Modal de confirmação */}
@@ -142,4 +142,4 @@ const Transaction = ({ navigation }) => {
 
 }
 
-export default Transaction;
+export default Transacao;
