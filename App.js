@@ -11,10 +11,14 @@ import Plant from './src/screens/Plant';
 import Transacao from './src/screens/Transacao';
 import HistoricoColetas from "./src/screens/HistoricoColetas";
 import HistoricoTransacoes from "./src/screens/HistoricoTransacoes";
+import { LogBox } from 'react-native';
 
 const Stack = createNativeStackNavigator();
 
 const App = () => {
+
+  LogBox.ignoreAllLogs(true); // Desativa avisos e erros da tela (apresentacoes e testes sem interferencia)
+
   return (
     <AuthProvider>
       <NavigationContainer>

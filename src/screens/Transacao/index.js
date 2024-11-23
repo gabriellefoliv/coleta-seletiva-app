@@ -22,10 +22,22 @@ const Transacao = ({ navigation }) => {
         setIsModalVisible(true); // Exibe o modal de confirmação
     };
 
-    const confirmTransfer = () => {
+    const confirmTransfer = async (codParceiro, pontos) => {
         setIsModalVisible(false); // Oculta o modal
-        Alert.alert("Sucesso", "Pontos transferidos com sucesso.");
-        // Aqui pode ser implementada a lógica de transferência de pontos
+        try {
+            const response = await api.post(`/recompensa/${user.codCliente}`, {
+                codParceiro: codParceiro,
+                pontos : pontos
+            });
+            if (response.status === 200){
+                Alert.alert("Sucesso", "Pontos transferidos com sucesso.");
+                fetchPontos(); // Atualiza os pontos do cliente após a transferência
+            } else {
+                Alert.alert("Erro", "Ocorreu um erro ao tranferir os pontos");
+            }
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     const fetchPontos = async () => {
@@ -121,9 +133,8 @@ const Transacao = ({ navigation }) => {
                                 <View style={styles.modalButtons}>
                                     <TouchableOpacity
                                         style={styles.modalButton}
-                                        onPress={confirmTransfer}
-                                    >
-                                        <Text style={styles.modalButtonText}>Confirmar</Text>
+                                        onPress={() => confirmTransfer(partner, pontos)}>
+                                            <Text style={styles.modalButtonText}>Confirmar</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         style={[styles.modalButton, { backgroundColor: '#ccc' }]}

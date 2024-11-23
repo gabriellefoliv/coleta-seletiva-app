@@ -26,11 +26,9 @@ const PlantaPage = ({ navigation }) => {
     const carregarPlanta = async () => {
         console.log("Em carregar planta, user = ", user); //TESTES
         try{
-            let response;
-            response = await api.get(`/planta/${user.codCliente}`);
-            const data = response.data[0];
-            setPlantaData(data);
-            console.log(data) // APAGAR DEPOIS
+            const response = await api.get(`/planta/${user.codCliente}`);
+            setPlantaData(response.data[0]);
+            console.log(response.data[0]) // APAGAR DEPOIS
         } catch (error){
             console.error("Erro ao carregar planta:", error.message); // Tratamento de erro
         } finally{
@@ -87,18 +85,13 @@ const PlantaPage = ({ navigation }) => {
         Alert.alert("Ajuda", "Regue a planta até ela atingir seu tamanho máximo, um botão de colher ficará disponível quando for o momento da colheita. Para verificar o tempo restante para regar novamente, basta clicar em regar.");
     }
 
-    // Alterar para que ao abrir a página seja possível utilizar somente o useEffect com o refresh.
-    useEffect(() => {   
-        carregarPlanta();
-    }, []);
-
     useEffect(() => {
         carregarPlanta();
     }, [refresh]);
 
     useEffect(() => {
         if (plantaData) {
-            console.log(plantaData.estagio); // APAGAR DEPOIS
+            //console.log(plantaData.estagio); // APAGAR DEPOIS
         }
     }, [plantaData]);
 
@@ -130,11 +123,12 @@ const PlantaPage = ({ navigation }) => {
 
                     {/* Botões de regar e colher */}
                     <View style={styles.botaoContainer}>
-                        <TouchableOpacity style={styles.botao} onPress={regarPlanta}>
-                            <Text style={styles.textoBotao}>Regar Planta</Text>
-                        </TouchableOpacity>
 
-                        {plantaData.estagio === 4 && (
+                        {plantaData.estagio < 4 ? (
+                            <TouchableOpacity style={styles.botao} onPress={regarPlanta}>
+                                <Text style={styles.textoBotao}>Regar Planta</Text>
+                            </TouchableOpacity>
+                        ) : (
                             <TouchableOpacity style={styles.botao} onPress={coletarPlanta}>
                                 <Text style={styles.textoBotao}>Colher Planta</Text>
                             </TouchableOpacity>
