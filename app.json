@@ -1,5 +1,10 @@
 {
   "expo": {
+    "notifications": {
+      "icon": "./assets/notification-icon.png",
+      "color": "#000000",
+      "iosDisplayInForeground": true
+    },
     "name": "coleta-premiada-app",
     "slug": "coleta-premiada-app",
     "version": "1.0.0",

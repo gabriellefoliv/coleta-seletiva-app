@@ -33,34 +33,44 @@ const PlantaPage = ({ navigation }) => {
   const [tempoRegaRestante, setTempoRegaRestante] = useState(null);
   const [isLoading, setIsLoading] = useState(true); // Is loading é ativo enquanto a planta ainda é carregada.
 
-  const agendarNotificacao = async () => {
-    // Configurar a notificação
-    const notificationId = await Notifications.scheduleNotificationAsync({
+  const agendarNotificacao = async (tempoRega) => {
+    const status = await Notifications.scheduleNotificationAsync({
       content: {
         title: "Lembrete",
         body: "É hora de regar a planta!",
         sound: "default", // Tocar o som padrão,
         vibrate: [0, 250, 250, 250],
-        data: { extraData: "Alguma informação extra" },
       },
       trigger: {
-        seconds: 5, // Tempo em segundos após o qual a notificação será disparada
+        seconds: tempoRega / 1000, // Tempo em segundos após o qual a notificação será disparada
       },
     });
 
-    console.log("Notificação agendada com ID:", notificationId);
+    console.log(status);
+  };
+
+  const formatarTempoRestante = (tempo) => {
+    const horas = Math.floor(tempo / (1000 * 60 * 60)); // Calcula as horas
+    const minutos = Math.floor((tempo % (1000 * 60 * 60)) / (1000 * 60)); // Calcula os minutos
+    const segundos = Math.floor((tempo % (1000 * 60)) / 1000); // Calcula os segundos
+
+    return `${horas.toString().padStart(2, "0")}:${minutos
+      .toString()
+      .padStart(2, "0")}:${segundos.toString().padStart(2, "0")}`; // Formata o tempo como hh:mm:ss
   };
 
   const carregarPlanta = async () => {
     console.log("Em carregar planta, user = ", user); //TESTES
     try {
       const response = await api.get(`/planta/${user.codCliente}`);
-      //console.log("Resposta", response);
-      console.log("Estagio:", response.data.result[0].estagio);
-      setPlantaData(response.data.result[0]);
-      console.log("Planta carregada :", response.data.result); // APAGAR DEPOIS
-      console.log("Tempo carregado :", response.data.tempoRestante); // APAGAR DEPOIS
-      setTempoRegaRestante(response.data.tempoRestante);
+      //console.log("Resposta", response.data);
+      console.log("Result:", response.data[0]);
+      setPlantaData(response.data[0]);
+      //console.log("Planta carregada :", response.data.result); // APAGAR DEPOIS
+      //console.log("Tempo carregado :", response.data.result); // APAGAR DEPOIS
+      setTempoRegaRestante(response.data[0].tempoRestante);
+      proximaRega = response.data[0].tempoRestante;
+      return proximaRega;
     } catch (error) {
       console.error("Erro ao carregar planta:", error.message); // Tratamento de erro
     } finally {
@@ -71,41 +81,17 @@ const PlantaPage = ({ navigation }) => {
   const regarPlanta = async () => {
     try {
       const response = await api.put(`/planta/rega/${user.codCliente}`);
-      tempoRestante = response.data.tempo;
-
       if (response.status === 200) {
-        alert(message);
-        if (response.status === 200) {
-          console.log("Regada");
-          setRefresh(!refresh);
-        }
-      } else if (response.status === 201) {
-        //Calcular o timestamp em tempo:
-        const horas = Math.floor(tempoRestante / (1000 * 60 * 60));
-        const minutos = Math.floor(
-          (tempoRestante % (1000 * 60 * 60)) / (1000 * 60)
-        );
-        const segundos = Math.floor((tempoRestante % (1000 * 60)) / 1000);
-
-        console.log("Não regada, em tempo de espera");
-        agendarNotificacao();
-        Alert.alert(
-          "Aguarde",
-          `Foi regada recentemente, volte em ${horas}:${minutos}:${segundos}`
-        );
-      } else {
-        // Caso contrário, a mensagem de erro já foi retornada pelo servidor
-        Alert.alert("Erro", "Erro ao regar a planta.");
+        Alert.alert("Sucesso", "Planta regada com sucesso!");
+        console.log("Regada");
+        proximaRega = await carregarPlanta();
+        agendarNotificacao(proximaRega);
+        //setRefresh(!refresh);
       }
+      setTempoRegaRestante(proximaRega); // Atualiza o tempo restante após regar
     } catch (error) {
-      if (error.status === 300) {
-        Alert.alert(
-          "Pronta para colheita",
-          "A planta já se encontra em estágio máximo e pronta para ser colhida!"
-        );
-      } else {
-        Alert.alert("Error", "Erro ao regar a planta, pedimos desculpas");
-      }
+      console.error("Erro ao regar planta:", error.message);
+      Alert.alert("Error", "Erro ao regar a planta, pedimos desculpas");
     }
   };
 
@@ -135,24 +121,65 @@ const PlantaPage = ({ navigation }) => {
   };
 
   useEffect(() => {
-    // Defina um canal de notificação para Android
+    // Listener para quando uma notificação for recebida
+    const notificacaoRecebida = Notifications.addNotificationReceivedListener(
+      (notification) => {
+        console.log("Notificação recebida:", notification);
+      }
+    );
+
+    // Listener para quando o usuário interagir com a notificação
+    const notificacaoRespondida =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log("Resposta recebida da notificação:", response);
+      });
+
+    // Limpar listeners quando o componente for desmontado
+    return () => {
+      notificacaoRecebida.remove();
+      notificacaoRespondida.remove();
+    };
+  }, []);
+
+  // Função para o countdown do tempo restante
+  useEffect(() => {
+    if (tempoRegaRestante !== null && tempoRegaRestante > 0) {
+      console.log(tempoRegaRestante);
+      const interval = setInterval(() => {
+        setTempoRegaRestante((prevTempo) => {
+          const novoTempo = prevTempo - 1000; // Decrease 1 second (in milliseconds)
+          if (novoTempo <= 0) {
+            clearInterval(interval); // Clear interval when countdown ends
+          }
+          return novoTempo;
+        });
+      }, 1000); // Executa a cada segundo
+      return () => clearInterval(interval); // Limpa o intervalo quando o componente desmontar ou tempoRestante for 0
+    }
+  }, [tempoRegaRestante]);
+
+  useEffect(() => {
     const criarCanal = async () => {
       if (Platform.OS === "android") {
-        const { status } = await Notifications.requestPermissionsAsync();
+        const { status } = await Notifications.getPermissionsAsync(); // Verifica o status atual
         if (status !== "granted") {
-          alert("Permissão de notificação não concedida");
-          return;
+          const { status: newStatus } =
+            await Notifications.requestPermissionsAsync(); // Solicita permissão se não for concedida
+          if (newStatus !== "granted") {
+            alert("Permissão de notificação não concedida");
+            return;
+          }
         }
 
+        // Configuração do canal de notificações
         await Notifications.setNotificationChannelAsync("default", {
           name: "default",
           importance: Notifications.AndroidImportance.HIGH,
           sound: true,
-          vibrate: true,
+          vibrate: [0, 250, 250, 250], // Vibração personalizada
         });
       }
     };
-
     criarCanal();
   }, []);
 
@@ -198,8 +225,19 @@ const PlantaPage = ({ navigation }) => {
           {/* Botões de regar e colher */}
           <View style={styles.botaoContainer}>
             {plantaData.estagio < 4 ? (
-              <TouchableOpacity style={styles.botao} onPress={regarPlanta}>
-                <Text style={styles.textoBotao}>Regar Planta</Text>
+              <TouchableOpacity
+                style={[
+                  styles.botao,
+                  { opacity: tempoRegaRestante > 0 ? 0.5 : 1 },
+                ]}
+                onPress={regarPlanta}
+                disabled={tempoRegaRestante > 0}
+              >
+                <Text style={styles.textoBotao}>
+                  {tempoRegaRestante > 0
+                    ? `Aguarde: ${formatarTempoRestante(tempoRegaRestante)}`
+                    : "Regar Planta"}
+                </Text>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity style={styles.botao} onPress={coletarPlanta}>
