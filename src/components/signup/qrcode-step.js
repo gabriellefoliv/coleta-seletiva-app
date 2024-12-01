@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Text, View, StyleSheet, Alert, Button, Modal, TouchableOpacity } from "react-native";
-import { Camera } from 'expo-camera/legacy';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Fontisto, Ionicons } from "@expo/vector-icons";
 
 export default function QRCodeStep({ visible, onClose, onQRCodeScanned }) {
-    const [hasPermission, setHasPermission] = useState(null);
+    const [hasPermission, setHasPermission] = useCameraPermissions();
     const [camera, setCamera] = useState(null);
     const [scanned, setScanned] = useState(false);
-    const [type, setType] = useState(Camera.Constants.Type.back);
-    const previousType = useRef(type);
+    const [facing, setFacing] = useState('back');
 
     // Solicita permissão para usar a câmera
     useEffect(() => {
@@ -26,13 +25,9 @@ export default function QRCodeStep({ visible, onClose, onQRCodeScanned }) {
         }
     };
 
-    const flipCamera = () => {
-        setType(
-            type === Camera.Constants.Type.back
-                ? Camera.Constants.Type.front
-                : Camera.Constants.Type.back
-        );
-    };
+    function toggleCameraFacing() {
+        setFacing(current => (current === 'back' ? 'front' : 'back'));
+    }
 
     const handleClose = async () => {
         if (camera) {
@@ -51,20 +46,22 @@ export default function QRCodeStep({ visible, onClose, onQRCodeScanned }) {
     return (
         <Modal visible={visible} onRequestClose={handleClose} animationType="slide">
             <View style={{ flex: 1 }}>
-                <Camera
+                <CameraView
                     style={styles.camera}
-                    type={type}
+                    facing={facing}
                     ref={(ref) => setCamera(ref)}
-                    onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-                />
-                <View style={styles.controls}>
-                    <TouchableOpacity onPress={handleClose}>
-                        <Ionicons name="close" size={40} color="white" />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={flipCamera}>
-                        <Fontisto name="arrow-return-right" size={30} color="white" />
-                    </TouchableOpacity>
-                </View>
+                    onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+                >
+
+                    <View style={styles.controls}>
+                        <TouchableOpacity onPress={handleClose}>
+                            <Ionicons name="close" size={40} color="white" />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={toggleCameraFacing}>
+                            <Fontisto name="arrow-return-right" size={30} color="white" />
+                        </TouchableOpacity>
+                    </View>
+                </CameraView>
             </View>
             {scanned && (
                 <Button title="Escanear novamente" onPress={() => setScanned(false)} />
