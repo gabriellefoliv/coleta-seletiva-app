@@ -11,7 +11,7 @@ import planta4 from "../../assets/images/planta/4.png";
 import { styles } from "./style.js";
 import GradientBackground from "../../components/Gradient/index.js";
 import * as Notifications from "expo-notifications";
-import { Platform } from "react-native";
+import { Button, Platform } from "react-native";
 
 import {
   View,
@@ -24,14 +24,19 @@ import {
   KeyboardAvoidingView,
   ActivityIndicator,
 } from "react-native";
+import DropDownPicker from "react-native-dropdown-picker";
 
 const PlantaPage = ({ navigation }) => {
   const route = useRoute();
   const { user } = useContext(AuthContext);
   const [plantaData, setPlantaData] = useState(null);
+  const [tipoPlantas, setTipoPlantas] = useState([]);
+  const [selectedTipoPlanta, setSelectedTipoPlanta] = useState(null);
   const [refresh, setRefresh] = useState(false);
   const [tempoRegaRestante, setTempoRegaRestante] = useState(null);
   const [isLoading, setIsLoading] = useState(true); // Is loading é ativo enquanto a planta ainda é carregada.
+  const [open, setOpen] = useState(false);
+  const [items, setItems] = useState([]);
 
   const agendarNotificacao = async (tempoRega) => {
     const status = await Notifications.scheduleNotificationAsync({
@@ -60,23 +65,98 @@ const PlantaPage = ({ navigation }) => {
   };
 
   const carregarPlanta = async () => {
-    console.log("Em carregar planta, user = ", user); //TESTES
+    console.log("Em carregar planta, user = ", user);
     try {
       const response = await api.get(`/planta/${user.codCliente}`);
-      //console.log("Resposta", response.data);
-      console.log("Result:", response.data[0]);
-      setPlantaData(response.data[0]);
-      //console.log("Planta carregada :", response.data.result); // APAGAR DEPOIS
-      //console.log("Tempo carregado :", response.data.result); // APAGAR DEPOIS
-      setTempoRegaRestante(response.data[0].tempoRestante);
-      proximaRega = response.data[0].tempoRestante;
-      return proximaRega;
+      const planta = response.data[0] || null; // Fallback para evitar null undefined
+      setPlantaData(planta);
+      if (planta) {
+        setTempoRegaRestante(planta.tempoRestante);
+        return planta.tempoRestante;
+      }
     } catch (error) {
-      console.error("Erro ao carregar planta:", error.message); // Tratamento de erro
+      console.error("Erro ao carregar planta:", error.message);
+      setPlantaData(null); // Garante estado consistente
     } finally {
       setIsLoading(false);
     }
   };
+
+  const carregarTiposPlanta = async () => {
+    try {
+      const response = await api.get(`/tipoPlanta`);
+      const tipos = response.data.map((tipo) => ({
+        label: tipo.nomeTipoPlanta,
+        value: tipo.codTipoPlanta,
+      }));
+      setItems(tipos);
+      setIsLoading(false); // Carregamento concluído
+    } catch (error) {
+      console.error("Erro ao carregar tipos de planta:", error.message);
+      Alert.alert("Erro", "Não foi possível carregar os tipos de planta.");
+    }
+  };
+
+
+  const criarPlanta = async () => {
+    if (!selectedTipoPlanta) {
+      alert("Por favor, selecione um tipo de planta.");
+      return;
+    }
+    try {
+      const response = await api.post(`/planta/${user.codCliente}`, {
+        codTipoPlanta: selectedTipoPlanta,
+      });
+      alert(response.data.message);
+      carregarPlanta(); // Atualiza a planta após criação
+    } catch (error) {
+      console.error("Erro ao criar planta:", error.message);
+    }
+  };
+
+  const verificarTipoPlanta = async () => {
+    if (!selectedTipoPlanta) return; // Evita execução se não houver tipo selecionado
+
+    try {
+      // Requisição para buscar todas as plantas do usuário
+      const response = await api.get(`/planta/${user.codCliente}`);
+      const plantas = response.data;
+
+      // Procurar a planta que tem o tipo selecionado
+      const plantaExistente = plantas.find(planta => planta.codTipoPlanta === selectedTipoPlanta);
+
+      if (plantaExistente) {
+        // Se a planta existe, renderiza a planta e mostra o nome do tipo
+        setPlantaData(plantaExistente);
+      } else {
+        // Se a planta não existe, mostra o popup para criar uma nova planta
+        Alert.alert(
+          "Nova Planta",
+          `Você deseja criar uma nova planta do tipo "${selectedTipoPlanta}"?`,
+          [
+            {
+              text: "Sim",
+              onPress: criarPlanta, // Cria nova planta
+            },
+            {
+              text: "Cancelar",
+              style: "cancel",
+              onPress: () => setSelectedTipoPlanta(null), // Reseta o dropdown caso o usuário cancele
+            },
+          ]
+        );
+      }
+    } catch (error) {
+      console.error("Erro ao verificar tipo de planta:", error.message);
+      Alert.alert("Erro", "Não foi possível verificar a planta selecionada.");
+      setSelectedTipoPlanta(null); // Reseta o dropdown em caso de erro
+    }
+  };
+
+  const handleTipoPlantaChange = (tipoPlantaSelecionada) => {
+    setSelectedTipoPlanta(tipoPlantaSelecionada);
+  };
+
 
   const regarPlanta = async () => {
     try {
@@ -184,7 +264,12 @@ const PlantaPage = ({ navigation }) => {
   }, []);
 
   useEffect(() => {
+    verificarTipoPlanta();
+  }, [selectedTipoPlanta])
+
+  useEffect(() => {
     carregarPlanta();
+    carregarTiposPlanta();
   }, [refresh]);
 
   useEffect(() => {
@@ -205,50 +290,91 @@ const PlantaPage = ({ navigation }) => {
       <>
         <Header navigation={navigation} title="Planta" />
         <View style={styles.Area}>
-          <TouchableOpacity style={styles.area_planta}>
-            <Image
-              source={
-                plantaData.estagio === 4
-                  ? planta4
-                  : plantaData.estagio === 3
-                  ? planta3
-                  : plantaData.estagio === 2
-                  ? planta2
-                  : plantaData.estagio === 1
-                  ? planta1
-                  : planta0
-              }
-              style={styles.planta}
-            />
-          </TouchableOpacity>
-
-          {/* Botões de regar e colher */}
-          <View style={styles.botaoContainer}>
-            {plantaData.estagio < 4 ? (
-              <TouchableOpacity
-                style={[
-                  styles.botao,
-                  { opacity: tempoRegaRestante > 0 ? 0.5 : 1 },
-                ]}
-                onPress={regarPlanta}
-                disabled={tempoRegaRestante > 0}
-              >
-                <Text style={styles.textoBotao}>
-                  {tempoRegaRestante > 0
-                    ? `Aguarde: ${formatarTempoRestante(tempoRegaRestante)}`
-                    : "Regar Planta"}
-                </Text>
+          {plantaData ? (
+            <View style={styles.plantaContainer}>
+              <DropDownPicker
+                open={open}
+                value={selectedTipoPlanta}
+                items={items}
+                setOpen={setOpen}
+                setValue={setSelectedTipoPlanta}
+                setItems={setItems}
+                placeholder="Selecione um tipo de planta"
+                onChangeValue={handleTipoPlantaChange}
+                style={styles.picker}
+              />
+              <View style={styles.plantTitle}>
+                <Text>Planta atual</Text>
+                <Text style={{ fontWeight: 'bold' }}>{plantaData.nomeTipoPlanta}</Text>
+              </View>
+              {/* <Text>Tempo restante para regar: {formatarTempo(plantaData.tempoRestante)}</Text> */}
+              <TouchableOpacity style={styles.area_planta}>
+                <Image
+                  source={
+                    plantaData?.estagio === 4
+                      ? planta4
+                      : plantaData?.estagio === 3
+                        ? planta3
+                        : plantaData?.estagio === 2
+                          ? planta2
+                          : plantaData?.estagio === 1
+                            ? planta1
+                            : planta0
+                  }
+                  style={styles.planta}
+                />
               </TouchableOpacity>
-            ) : (
-              <TouchableOpacity style={styles.botao} onPress={coletarPlanta}>
-                <Text style={styles.textoBotao}>Colher Planta</Text>
-              </TouchableOpacity>
-            )}
-          </View>
 
-          <TouchableOpacity style={styles.botaoAjuda} onPress={pedirAjuda}>
-            <Text style={styles.textoBotaoAjuda}>Ajuda ?</Text>
-          </TouchableOpacity>
+              {/* Botões de regar e colher */}
+              <View style={styles.botaoContainer}>
+                {plantaData.estagio < 4 ? (
+                  <TouchableOpacity
+                    style={[
+                      styles.botao,
+                      { opacity: tempoRegaRestante > 0 ? 0.5 : 1 },
+                    ]}
+                    onPress={regarPlanta}
+                    disabled={tempoRegaRestante > 0}
+                  >
+                    <Text style={styles.textoBotao}>
+                      {tempoRegaRestante > 0
+                        ? `Aguarde: ${formatarTempoRestante(tempoRegaRestante)}`
+                        : "Regar Planta"}
+                    </Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity style={styles.botao} onPress={coletarPlanta}>
+                    <Text style={styles.textoBotao}>Colher Planta</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              <TouchableOpacity style={styles.botaoAjuda} onPress={pedirAjuda}>
+                <Text style={styles.textoBotaoAjuda}>Ajuda ?</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.criarPlantaContainer}>
+              <Text style={styles.title}>Você ainda não tem uma planta!</Text>
+              <Text style={styles.title}>Crie uma para começar.</Text>
+              <View style={styles.pickerWrapper}>
+                <DropDownPicker
+                  open={open}
+                  value={selectedTipoPlanta}
+                  items={items}
+                  setOpen={setOpen}
+                  setValue={setSelectedTipoPlanta}
+                  setItems={setItems}
+                  placeholder="Selecione uma planta"
+                  style={styles.picker}
+                  dropDownContainerStyle={styles.dropdownContainer}
+                />
+              </View>
+              <TouchableOpacity onPress={criarPlanta} style={styles.criarPlantaButton}>
+                <Text style={{ color: 'white', fontWeight: 'bold' }}>Criar planta</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </>
     );
