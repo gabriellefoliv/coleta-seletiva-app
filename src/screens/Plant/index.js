@@ -2,6 +2,8 @@ import { api } from "../../lib/axios";
 import { useRoute } from "@react-navigation/native";
 import { AuthContext } from "../../context/auth";
 import React, { useEffect, useContext, useState } from "react";
+import DropDownPicker from "react-native-dropdown-picker";
+import * as Notifications from "expo-notifications";
 import Header from "../../components/Header";
 import planta0 from "../../assets/images/planta/0.png";
 import planta1 from "../../assets/images/planta/1.png";
@@ -9,22 +11,16 @@ import planta2 from "../../assets/images/planta/2.png";
 import planta3 from "../../assets/images/planta/3.png";
 import planta4 from "../../assets/images/planta/4.png";
 import { styles } from "./style.js";
-import GradientBackground from "../../components/Gradient/index.js";
-import * as Notifications from "expo-notifications";
-import { Button, Platform } from "react-native";
 
 import {
   View,
-  TextInput,
   Text,
   Alert,
   TouchableOpacity,
   Image,
-  StatusBar,
-  KeyboardAvoidingView,
   ActivityIndicator,
+  Platform
 } from "react-native";
-import DropDownPicker from "react-native-dropdown-picker";
 
 const PlantaPage = ({ navigation }) => {
   const route = useRoute();
@@ -65,18 +61,19 @@ const PlantaPage = ({ navigation }) => {
   };
 
   const carregarPlanta = async () => {
-    console.log("Em carregar planta, user = ", user);
     try {
       const response = await api.get(`/planta/${user.codCliente}`);
-      const planta = response.data[0] || null; // Fallback para evitar null undefined
-      setPlantaData(planta);
+      const planta = response.data[0] || null;
+      setPlantaData(planta); // Armazena a planta completa no estado
+
       if (planta) {
         setTempoRegaRestante(planta.tempoRestante);
+        console.log("Código da planta carregada:", planta.codPlanta); // Log para validação
         return planta.tempoRestante;
       }
     } catch (error) {
       console.error("Erro ao carregar planta:", error.message);
-      setPlantaData(null); // Garante estado consistente
+      setPlantaData(null);
     } finally {
       setIsLoading(false);
     }
@@ -115,83 +112,104 @@ const PlantaPage = ({ navigation }) => {
   };
 
   const verificarTipoPlanta = async () => {
-    if (!selectedTipoPlanta) return; // Evita execução se não houver tipo selecionado
+    if (!selectedTipoPlanta) return; // Evita execução desnecessária
 
     try {
-      // Requisição para buscar todas as plantas do usuário
       const response = await api.get(`/planta/${user.codCliente}`);
       const plantas = response.data;
 
-      // Procurar a planta que tem o tipo selecionado
-      const plantaExistente = plantas.find(planta => planta.codTipoPlanta === selectedTipoPlanta);
+      const plantaExistente = plantas.find(
+        (planta) => planta.codTipoPlanta === selectedTipoPlanta
+      );
 
       if (plantaExistente) {
-        // Se a planta existe, renderiza a planta e mostra o nome do tipo
         setPlantaData(plantaExistente);
+        setTempoRegaRestante(plantaExistente.tempoRestante || null);
       } else {
-        // Se a planta não existe, mostra o popup para criar uma nova planta
         Alert.alert(
           "Nova Planta",
-          `Você deseja criar uma nova planta do tipo "${selectedTipoPlanta}"?`,
+          `Deseja criar uma planta do tipo "${selectedTipoPlanta}"?`,
           [
             {
               text: "Sim",
-              onPress: criarPlanta, // Cria nova planta
+              onPress: criarPlanta,
             },
             {
               text: "Cancelar",
               style: "cancel",
-              onPress: () => setSelectedTipoPlanta(null), // Reseta o dropdown caso o usuário cancele
+              onPress: () => setSelectedTipoPlanta(null),
             },
           ]
         );
       }
     } catch (error) {
       console.error("Erro ao verificar tipo de planta:", error.message);
-      Alert.alert("Erro", "Não foi possível verificar a planta selecionada.");
-      setSelectedTipoPlanta(null); // Reseta o dropdown em caso de erro
+      setSelectedTipoPlanta(null);
     }
   };
 
-  const handleTipoPlantaChange = (tipoPlantaSelecionada) => {
+  const handleTipoPlantaChange = async (tipoPlantaSelecionada) => {
     setSelectedTipoPlanta(tipoPlantaSelecionada);
+    setPlantaData(null); // Reseta a planta atual
+    setTempoRegaRestante(null); // Reseta o contador de rega
+
+    if (tipoPlantaSelecionada) {
+      await verificarTipoPlanta(); // Verifica se existe planta do tipo selecionado
+    }
   };
 
-
   const regarPlanta = async () => {
+    console.log("Estado atual de plantaData dentro de regarPlanta:", plantaData);
+
+    if (!plantaData || !plantaData.codPlanta) {
+      console.error("Erro: plantaData está ausente ou inválida:", plantaData);
+      Alert.alert("Erro", "Não foi possível identificar a planta.");
+      return;
+    }
+
     try {
-      const response = await api.put(`/planta/rega/${user.codCliente}`);
+      console.log("Código da planta a ser regada:", plantaData.codPlanta);
+
+      const response = await api.put(`/planta/rega/${plantaData.codPlanta}`, {
+        codCliente: user.codCliente, // Envia o código do cliente no corpo
+      });
+
       if (response.status === 200) {
         Alert.alert("Sucesso", "Planta regada com sucesso!");
-        console.log("Regada");
-        proximaRega = await carregarPlanta();
+        console.log("Planta regada");
+
+        const proximaRega = await carregarPlanta(plantaData.codPlanta);
         agendarNotificacao(proximaRega);
-        //setRefresh(!refresh);
+        setTempoRegaRestante(proximaRega);
+      } else {
+        Alert.alert("Erro", response.data?.message || "Erro desconhecido.");
       }
-      setTempoRegaRestante(proximaRega); // Atualiza o tempo restante após regar
     } catch (error) {
       console.error("Erro ao regar planta:", error.message);
-      Alert.alert("Error", "Erro ao regar a planta, pedimos desculpas");
+      Alert.alert("Erro", "Erro ao regar a planta. Pedimos desculpas.");
     }
   };
 
   const coletarPlanta = async () => {
     try {
-      const response = await api.post(`/planta/coleta/${user.codCliente}`);
+      const response = await api.post(`/planta/coleta/${plantaData.codPlanta}`, {
+        codCliente: user.codCliente,
+      });
 
       if (response.status === 200) {
-        const message = await response.data.message;
+        const { message } = response.data;
         alert(message);
         setRefresh(!refresh);
       } else {
-        const errorMessage = await response.text();
+        const errorMessage = response.data?.message || "Erro inesperado.";
         alert(errorMessage);
       }
     } catch (error) {
       console.error("Erro ao coletar planta:", error);
-      Alert.alert("Error", "Erro ao colher a planta, pedimos desculpas");
+      alert("Erro ao colher a planta, pedimos desculpas.");
     }
   };
+
 
   const pedirAjuda = async () => {
     Alert.alert(
@@ -199,6 +217,10 @@ const PlantaPage = ({ navigation }) => {
       "Regue a planta até ela atingir seu tamanho máximo, um botão de colher ficará disponível quando for o momento da colheita. Para verificar o tempo restante para regar novamente, basta clicar em regar."
     );
   };
+
+  useEffect(() => {
+    console.log("Estado atualizado de plantaData:", plantaData);
+  }, [plantaData]);
 
   useEffect(() => {
     // Listener para quando uma notificação for recebida
@@ -264,8 +286,13 @@ const PlantaPage = ({ navigation }) => {
   }, []);
 
   useEffect(() => {
-    verificarTipoPlanta();
-  }, [selectedTipoPlanta])
+    if (selectedTipoPlanta) {
+      setPlantaData(null); // Reseta a planta anterior
+      setTempoRegaRestante(null); // Reseta o contador
+      verificarTipoPlanta(); // Verifica e atualiza a planta do tipo selecionado
+    }
+  }, [selectedTipoPlanta]);
+
 
   useEffect(() => {
     carregarPlanta();
@@ -333,7 +360,7 @@ const PlantaPage = ({ navigation }) => {
                       styles.botao,
                       { opacity: tempoRegaRestante > 0 ? 0.5 : 1 },
                     ]}
-                    onPress={regarPlanta}
+                    onPress={() => regarPlanta()}
                     disabled={tempoRegaRestante > 0}
                   >
                     <Text style={styles.textoBotao}>
@@ -342,6 +369,7 @@ const PlantaPage = ({ navigation }) => {
                         : "Regar Planta"}
                     </Text>
                   </TouchableOpacity>
+
                 ) : (
                   <TouchableOpacity style={styles.botao} onPress={coletarPlanta}>
                     <Text style={styles.textoBotao}>Colher Planta</Text>

@@ -30,6 +30,7 @@ export const styles = StyleSheet.create({
         //backgroundColor: 'lightgray', // para visualizar a área, pode remover depois
         alignItems: 'center', // para centralizar a planta dentro da área
         borderRadius: 10, // exemplo de estilo opcional
+        marginLeft: 60
     },
     botaoContainer: {
         position: 'absolute', // Para sobrepor na tela
@@ -54,6 +55,8 @@ export const styles = StyleSheet.create({
         borderRadius: 10,
         marginBottom: 20, // Espaçamento entre os botões
         alignItems: 'center',
+        justifyContent: 'center',
+        marginLeft: 100
     },
     textoBotao: {
         color: 'white',
