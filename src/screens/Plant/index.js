@@ -33,6 +33,8 @@ const PlantaPage = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(true); // Is loading é ativo enquanto a planta ainda é carregada.
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([]);
+  const [isCreating, setIsCreating] = useState(false);
+
 
   const agendarNotificacao = async (tempoRega) => {
     const status = await Notifications.scheduleNotificationAsync({
@@ -96,18 +98,19 @@ const PlantaPage = ({ navigation }) => {
 
 
   const criarPlanta = async () => {
-    if (!selectedTipoPlanta) {
-      alert("Por favor, selecione um tipo de planta.");
-      return;
-    }
+    if (!selectedTipoPlanta || isCreating) return;
+
+    setIsCreating(true);
     try {
       const response = await api.post(`/planta/${user.codCliente}`, {
         codTipoPlanta: selectedTipoPlanta,
       });
       alert(response.data.message);
-      carregarPlanta(); // Atualiza a planta após criação
+      await carregarPlanta(); // Atualiza a planta após criação
     } catch (error) {
       console.error("Erro ao criar planta:", error.message);
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -118,6 +121,7 @@ const PlantaPage = ({ navigation }) => {
       const response = await api.get(`/planta/${user.codCliente}`);
       const plantas = response.data;
 
+      // Verificar se a planta já existe
       const plantaExistente = plantas.find(
         (planta) => planta.codTipoPlanta === selectedTipoPlanta
       );
@@ -126,9 +130,13 @@ const PlantaPage = ({ navigation }) => {
         setPlantaData(plantaExistente);
         setTempoRegaRestante(plantaExistente.tempoRestante || null);
       } else {
+        // Buscar detalhes do tipo de planta para obter o nome
+        const responseTipo = await api.get(`/tipoPlanta/${selectedTipoPlanta}`);
+        const nomeTipoPlanta = responseTipo.data.nomeTipoPlanta || "desconhecido";
+
         Alert.alert(
           "Nova Planta",
-          `Deseja criar uma planta do tipo "${selectedTipoPlanta}"?`,
+          `Deseja criar uma planta do tipo ${nomeTipoPlanta}?`,
           [
             {
               text: "Sim",
@@ -147,6 +155,7 @@ const PlantaPage = ({ navigation }) => {
       setSelectedTipoPlanta(null);
     }
   };
+
 
   const handleTipoPlantaChange = async (tipoPlantaSelecionada) => {
     setSelectedTipoPlanta(tipoPlantaSelecionada);
@@ -289,7 +298,6 @@ const PlantaPage = ({ navigation }) => {
     if (selectedTipoPlanta) {
       setPlantaData(null); // Reseta a planta anterior
       setTempoRegaRestante(null); // Reseta o contador
-      verificarTipoPlanta(); // Verifica e atualiza a planta do tipo selecionado
     }
   }, [selectedTipoPlanta]);
 

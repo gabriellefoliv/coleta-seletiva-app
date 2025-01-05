@@ -87,4 +87,19 @@ export const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#00907a',
     },
+    emptyContainer: {
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 20,
+        backgroundColor: "#fff",
+        padding: 20,
+        borderRadius: 10,
+    },
+    emptyText: {
+        fontSize: 16,
+        color: "#555",
+        textAlign: "center",
+        paddingHorizontal: 20,
+    },
+
 });

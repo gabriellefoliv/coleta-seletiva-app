@@ -16,6 +16,7 @@ const Ranking = ({ navigation }) => {
     const [formattedDate, setFormattedDate] = useState("");
     const [position, setPosition] = useState(null);
 
+
     const formatName = (name) => {
         const parts = name.split(" ");
         if (parts.length > 1) {
@@ -36,10 +37,17 @@ const Ranking = ({ navigation }) => {
     };
 
     useEffect(() => {
+        const currentDate = new Date();
+        setFormattedDate(formatDate(currentDate));
+    }, []);
+
+    useEffect(() => {
         const fetchRanking = async () => {
             try {
                 const response = await api.get('/ranking');
+                console.log("Ranking data:", response.data);
                 setRanking(response.data);
+
 
                 if (response.data.length > 0) {
                     setFormattedDate(formatDate(response.data[0].dataAcao));
@@ -88,17 +96,25 @@ const Ranking = ({ navigation }) => {
                 {position !== null && (
                     <View style={styles.totalCard}>
                         <Text style={styles.totalText}>Sua posição atual é:</Text>
-                        <Text style={styles.totalPeso}>{position}</Text>
+                        <Text style={styles.totalPeso}>{position}º</Text>
                     </View>
                 )}
                 <Text style={styles.dateText}>{formattedDate}</Text>
-                <FlatList
-                    data={ranking}
-                    keyExtractor={(item) => item.codCliente.toString()}
-                    renderItem={renderRankingItem}
-                    contentContainerStyle={styles.rankingList}
-                    showsVerticalScrollIndicator={false}
-                />
+                {ranking.length === 0 ? (
+                    <View style={styles.emptyContainer}>
+                        <Text style={styles.emptyText}>
+                            Não há ranking no momento. Jogue e consiga uma colocação!
+                        </Text>
+                    </View>
+                ) : (
+                    <FlatList
+                        data={ranking}
+                        keyExtractor={(item) => item.codCliente.toString()}
+                        renderItem={renderRankingItem}
+                        contentContainerStyle={styles.rankingList}
+                        showsVerticalScrollIndicator={false}
+                    />
+                )}
             </View>
         </>
     );
